@@ -16,11 +16,11 @@ public class Shooting extends LinearOpMode {
 
         waitForStart();
 
-        hardware.getShooter().setPower(.8);
+       // hardware.getShooter().setPower(.8);
         sleep(1000);
         hardware.setLoaderPower(8.0);
         sleep(5000);
-        hardware.getShooter().setPower(0.0);
+       // hardware.getShooter().setPower(0.0);
         hardware.setLoaderPower(0.0);
     }
 }

@@ -101,7 +101,10 @@ public class RobotHardware {
     //motor variables
     private SyncedDcMotors leftDrive;
     private SyncedDcMotors rightDrive;
-    private SyncedDcMotors shooter;
+
+    private DcMotor shooterLeft;
+    private DcMotor shooterRight;
+
     private DcMotor intake;
     private DcMotor turretRotation;
     //servo variables
@@ -132,9 +135,15 @@ public class RobotHardware {
         rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        shooter = new SyncedDcMotors(hardwareMap, DcMotorSimple.Direction.REVERSE, SyncedDcMotors.ALTERNATING, SHOOTER_MOTOR_LEFT, SHOOTER_MOTOR_RIGHT);
-        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        shooterLeft = hardwareMap.get(DcMotor.class, SHOOTER_MOTOR_LEFT);
+        shooterRight = hardwareMap.get(DcMotor.class, SHOOTER_MOTOR_RIGHT);
+
+        shooterLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooterRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooterLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        shooterRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+
 
         intake = hardwareMap.get(DcMotor.class, INTAKE_MOTOR);
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -223,9 +232,11 @@ public class RobotHardware {
         return rightDrive;
     }
 
-    public SyncedDcMotors getShooter() {
-        return shooter;
+    public DcMotor getShooterLeft() {
+        return shooterLeft;
     }
+
+    public DcMotor getShooterRight() { return shooterRight;}
 
     public DcMotor getIntake() {
         return intake;
