@@ -26,7 +26,7 @@ import java.util.Locale;
  * To test the new BNO055 sensor
  */
 
-@TeleOp(name = "Adafruit IMU Test", group = "accel")
+@TeleOp(name = "Adafruit IMU Test", group = "test")
 @Disabled
 public class AdafruitTest extends OpMode {
 

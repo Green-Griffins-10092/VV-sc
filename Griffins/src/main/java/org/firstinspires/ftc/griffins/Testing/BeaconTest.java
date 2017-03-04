@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.griffins.Testing;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.griffins.RobotHardware;
@@ -12,8 +13,8 @@ import static org.firstinspires.ftc.griffins.RobotHardware.BUTTON_PUSHER_LEFT_FU
  * Created by David on 12/15/2016.
  */
 
-@Autonomous(name = "Beacon Pushing Test", group = "testing")
-//@Disabled
+@Autonomous(name = "Beacon Pushing Test", group = "test")
+@Disabled
 public class BeaconTest extends LinearOpMode {
     public static final double BEACON_SERVO_INCREMENT = (BUTTON_PUSHER_LEFT_FULL_EXTENSION - BUTTON_PUSHER_CENTER_POSITION) / 15;
     private RobotHardware.BeaconState alliance = RobotHardware.BeaconState.RED_RED;
@@ -22,6 +23,7 @@ public class BeaconTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         RobotHardware hardware = new RobotHardware();
         hardware.initialize(hardwareMap);
+        hardware.registerBeaconColorSensors();
 
         waitForStart();
 

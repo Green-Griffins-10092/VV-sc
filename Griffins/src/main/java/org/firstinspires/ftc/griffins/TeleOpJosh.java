@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.griffins;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.griffins.RobotHardware.BeaconState;
@@ -7,7 +8,8 @@ import org.firstinspires.ftc.griffins.RobotHardware.BeaconState;
 /**
  * Created by David on 1/20/2017.
  */
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Josh", group = "test")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Josh Teleop", group = "test")
+@Disabled
 public class TeleOpJosh extends OpMode {
 
     private RobotHardware hardware;
@@ -99,7 +101,8 @@ public class TeleOpJosh extends OpMode {
         }
 
         hardware.setDrivePower(leftDrivePower, rightDrivePower);
-        hardware.getShooter().setPower(shooterPower);
+        hardware.getShooterLeft().setPower(shooterPower);
+        hardware.getShooterRight().setPower(shooterPower);
         hardware.getIntake().setPower(intakeSpeed);
         hardware.setLoaderPower(loaderPower);
         hardware.pushButtonFullExtension(beaconPushState, BeaconState.BLUE);

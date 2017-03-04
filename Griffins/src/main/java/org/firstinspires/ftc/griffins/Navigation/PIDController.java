@@ -60,7 +60,6 @@ public class PIDController { //for upcoming comp, just use P and D controllers
         if(output != null)
             output.setPower(control);
         return control;
-        //return control; //send to output (motor value = control + currValue)
     }
 
     public void PIDdisable(){
@@ -75,6 +74,7 @@ public class PIDController { //for upcoming comp, just use P and D controllers
 
     public void setSetPoint(double setPoint) {
         this.setPoint = setPoint;
+        intTerm = 0;
     }
 
     public double getError(){
@@ -91,7 +91,11 @@ public class PIDController { //for upcoming comp, just use P and D controllers
             propTerm = kP*error;
             intError = kI * error;
 
-            intTerm += intError;
+            if (this.isOnTarget()) {
+                intTerm = 0;
+            } else if (Math.abs(error) < 10) {
+                intTerm += intError;
+            }
 
             if (lastError != 0.0)
                 derTerm = kD * (error - lastError);

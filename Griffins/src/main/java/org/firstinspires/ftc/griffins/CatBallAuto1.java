@@ -13,8 +13,8 @@ import static org.firstinspires.ftc.griffins.RobotHardware.ENCODER_COUNTS_PER_IN
 /**
  * Created by David on 12/7/2016.
  */
-@Autonomous(name = "Cat Ball Auto", group = "Auto")
-public class Auto extends LinearOpMode implements FtcMenu.MenuButtonsAndDashboard {
+@Autonomous(name = "Cat Ball Auto 1", group = "Competition")
+public class CatBallAuto1 extends LinearOpMode implements FtcMenu.MenuButtonsAndDashboard {
     public static final double countsPerRobotRotation = ENCODER_COUNTS_PER_INCH * Math.PI * 14.5625;
     HalDashboard halDashboard;
     private RobotHardware hardware;
@@ -47,13 +47,9 @@ public class Auto extends LinearOpMode implements FtcMenu.MenuButtonsAndDashboar
         waitForStart();
         sleep(15000);
         //autoFunctions.driveStraightSimple((int) (firstDriveDistance * ENCODER_COUNTS_PER_INCH), AutoFunctions.DriveStraightDirection.FORWARD, .5);
-        hardware.getShooter().setPower(1);
-        sleep(1000);
-        hardware.setLoaderPower(0.9);
-        sleep(5000);
-        hardware.getShooter().setPower(0.0);
-        hardware.setLoaderPower(0.0);
-        sleep(1000);
+        autoFunctions.shoot();
+        hardware.getIntake().setPower(1.0);
+        sleep(500);
         hardware.getIntake().setPower(-1.0);
         autoFunctions.driveStraightPID(50, AutoFunctions.DriveStraightDirection.FORWARD);
 

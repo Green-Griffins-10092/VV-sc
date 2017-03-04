@@ -17,7 +17,7 @@ import java.util.List;
  * Created by David on 11/20/2016.
  */
 
-@TeleOp(name = "MR acceleration test", group = "accel")
+@TeleOp(name = "MR acceleration test", group = "test")
 @Disabled
 public class ModernRoboticsAccelerometerTest extends OpMode {
 

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.griffins;
 
 import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsAnalogOpticalDistanceSensor;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cColorSensor;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -10,11 +11,15 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.I2cAddr;
+import com.qualcomm.robotcore.hardware.I2cController;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.util.TypeConversion;
 
 import org.firstinspires.ftc.griffins.Navigation.PIDController;
 import org.firstinspires.ftc.robotcore.external.Func;
+
+import java.util.concurrent.locks.Lock;
 
 import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.BLUE;
 import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.BLUE_BLUE;
@@ -49,6 +54,7 @@ public class RobotHardware {
     public static final String TURRET_GYRO = "gyro";
     public static final String LEFT_BUTTON_PUSHER_SENSOR = "colorL";
     public static final String RIGHT_BUTTON_PUSHER_SENSOR = "colorR";
+    public static final String LOADER_COLOR_SENSOR = "intake color";
     public static final String BEACON_DISTANCE_SENSOR = "distance";
     public static final String LOADER_SWITCH = "loader switch";
     public static final String BNO055_SENSOR = "bno055";
@@ -56,14 +62,15 @@ public class RobotHardware {
     // The constants for motor encoders
     public static final int NEVEREST_ENCODER_COUNT_PER_ROTATION = 28;
     public static final int NEVEREST_40_ENCODER_COUNTS_PER_ROTATION = NEVEREST_ENCODER_COUNT_PER_ROTATION * 40;
-    // The addresses for the color sensors, since we are using two, the default will be changed
+    // The addresses for the color sensors, since we are using three, the default will be changed
     public static final I2cAddr LEFT_COLOR_SENSOR_ADDRESS = I2cAddr.create8bit(0x38);
     public static final I2cAddr RIGHT_COLOR_SENSOR_ADDRESS = I2cAddr.create8bit(0x3C);
+    public static final I2cAddr LOADER_COLOR_SENSOR_ADDRESS = I2cAddr.create8bit(0x32);
     // The constants for the button pusher positions
-    public static final double BUTTON_PUSHER_CENTER_POSITION = 107 / 255.0;
-    public static final double BUTTON_PUSHER_RATIO = 4 / 4.0;
-    public static final double BUTTON_PUSHER_LEFT_FULL_EXTENSION = 82 / 255.0;
-    public static final double BUTTON_PUSHER_RIGHT_FULL_EXTENSION = 132 / 255.0;
+    public static final double BUTTON_PUSHER_CENTER_POSITION = 97 / 255.0;
+    public static final double BUTTON_PUSHER_RATIO = 5 / 5.0;
+    public static final double BUTTON_PUSHER_LEFT_FULL_EXTENSION = 67 / 255.0;
+    public static final double BUTTON_PUSHER_RIGHT_FULL_EXTENSION = 127 / 255.0;
     // The constants for the loader speeds
     public static final double LOADER_ZERO_POWER = 0;
     public static final double LOADER_FULL_REVERSE_POWER = -2 / 3.0;
@@ -81,20 +88,23 @@ public class RobotHardware {
     public static final int TURRET_ENCODER_COUNT_REVOLUTION_LIMIT = (int) (ENCODER_COUNTS_PER_TURRET_DEGREE * 200);
     // The Vuforia License Key
     public static final String VUFORIA_LICENSE_KEY = "AT3JPAj/////AAAAGdMIFxYU7UYXs7ZUAq3xlpUJDbeYIAIe69usc" +
-                                                     "Pw2c6g2kjczfs8x9A1YX2Mi3SLEFsx0JM1x9Lm733yP8I8HxGqUGJ" +
-                                                     "r2HDUcUheHtJZ3itjlnCaAZWYqeV+RB4bU8t3BW3pnecmQ9BmjcUO" +
-                                                     "aO32ENJIc0PRvpzPFNTtKB6HHJwNhPoMZYonmVEVeCwsuSfIhyzl1" +
-                                                     "KWHU8GVzgdz3NRBs0O7Dedd+cECw9dmXX0TutXkuMr9ykOstrDXM6" +
-                                                     "1D1Hb2DuY+4LKERkLFwUm/TDv5+zR7A4eDoE92nmEIpVdSfR7kNYG" +
-                                                     "QGeDbWK7/oHGjwVYOZvEvmTW9dMBDQNiCCeWCag6o4odFTMo5Tc8U6+grD2qVR";
-    PIDController turretController;
+            "Pw2c6g2kjczfs8x9A1YX2Mi3SLEFsx0JM1x9Lm733yP8I8HxGqUGJ" +
+            "r2HDUcUheHtJZ3itjlnCaAZWYqeV+RB4bU8t3BW3pnecmQ9BmjcUO" +
+            "aO32ENJIc0PRvpzPFNTtKB6HHJwNhPoMZYonmVEVeCwsuSfIhyzl1" +
+            "KWHU8GVzgdz3NRBs0O7Dedd+cECw9dmXX0TutXkuMr9ykOstrDXM6" +
+            "1D1Hb2DuY+4LKERkLFwUm/TDv5+zR7A4eDoE92nmEIpVdSfR7kNYG" +
+            "QGeDbWK7/oHGjwVYOZvEvmTW9dMBDQNiCCeWCag6o4odFTMo5Tc8U6+grD2qVR";
+    private PIDController turretController;
     private double BUTTON_PUSHER_LEFT_POSITION = (BUTTON_PUSHER_LEFT_FULL_EXTENSION - BUTTON_PUSHER_CENTER_POSITION) * BUTTON_PUSHER_RATIO + BUTTON_PUSHER_CENTER_POSITION;
     private double BUTTON_PUSHER_RIGHT_POSITION = (BUTTON_PUSHER_RIGHT_FULL_EXTENSION - BUTTON_PUSHER_CENTER_POSITION) * BUTTON_PUSHER_RATIO + BUTTON_PUSHER_CENTER_POSITION;
     private BeaconState alliance;
     //motor variables
     private SyncedDcMotors leftDrive;
     private SyncedDcMotors rightDrive;
-    private SyncedDcMotors shooter;
+
+    private DcMotor shooterLeft;
+    private DcMotor shooterRight;
+
     private DcMotor intake;
     private DcMotor turretRotation;
     //servo variables
@@ -105,8 +115,9 @@ public class RobotHardware {
     private Servo loaderServoOne;
     //sensor variables
     private ModernRoboticsI2cGyro turretGyro;
-    private ColorSensor leftButtonPusherColorSensor;
-    private ColorSensor rightButtonPusherColorSensor;
+    private ModernRoboticsI2cColorSensor leftButtonPusherColorSensor;
+    private ModernRoboticsI2cColorSensor rightButtonPusherColorSensor;
+    private ModernRoboticsI2cColorSensor loaderColorSensor;
     private ModernRoboticsAnalogOpticalDistanceSensor beaconDistanceSensor;
     private DigitalChannel loaderParticleLimitSwitch;
     private BNO055IMU robotTracker;
@@ -124,9 +135,15 @@ public class RobotHardware {
         rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        shooter = new SyncedDcMotors(hardwareMap, DcMotorSimple.Direction.REVERSE, SyncedDcMotors.ALTERNATING, SHOOTER_MOTOR_LEFT, SHOOTER_MOTOR_RIGHT);
-        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        shooterLeft = hardwareMap.get(DcMotor.class, SHOOTER_MOTOR_LEFT);
+        shooterRight = hardwareMap.get(DcMotor.class, SHOOTER_MOTOR_RIGHT);
+
+        shooterLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooterRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooterLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        shooterRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+
 
         intake = hardwareMap.get(DcMotor.class, INTAKE_MOTOR);
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -164,15 +181,24 @@ public class RobotHardware {
         turretGyro.calibrate();  //look at z axis scaling coefficient when available
         turretGyro.setHeadingMode(ModernRoboticsI2cGyro.HeadingMode.HEADING_CARTESIAN); // verify that the angles have the correct sign
 
-        leftButtonPusherColorSensor = hardwareMap.get(ColorSensor.class, LEFT_BUTTON_PUSHER_SENSOR);
+        leftButtonPusherColorSensor = hardwareMap.get(ModernRoboticsI2cColorSensor.class, LEFT_BUTTON_PUSHER_SENSOR);
         leftButtonPusherColorSensor.setI2cAddress(LEFT_COLOR_SENSOR_ADDRESS);
         leftButtonPusherColorSensor.enableLed(true);
         leftButtonPusherColorSensor.enableLed(false);
 
-        rightButtonPusherColorSensor = hardwareMap.get(ColorSensor.class, RIGHT_BUTTON_PUSHER_SENSOR);
+        rightButtonPusherColorSensor = hardwareMap.get(ModernRoboticsI2cColorSensor.class, RIGHT_BUTTON_PUSHER_SENSOR);
         rightButtonPusherColorSensor.setI2cAddress(RIGHT_COLOR_SENSOR_ADDRESS);
         rightButtonPusherColorSensor.enableLed(true);
         rightButtonPusherColorSensor.enableLed(false);
+
+        deregisterBeaconColorSensors(); // TODO: 2/12/2017 need to register the color sensors in relevant files!
+
+        loaderColorSensor = hardwareMap.get(ModernRoboticsI2cColorSensor.class, LOADER_COLOR_SENSOR);
+        loaderColorSensor.setI2cAddress(LOADER_COLOR_SENSOR_ADDRESS);
+        loaderColorSensor.enableLed(false);
+        loaderColorSensor.enableLed(true);
+
+        deregisterLoaderColorSensor();
 
         /*beaconDistanceSensor = hardwareMap.get(ModernRoboticsAnalogOpticalDistanceSensor.class, BEACON_DISTANCE_SENSOR);
         beaconDistanceSensor.enableLed(true);
@@ -188,10 +214,10 @@ public class RobotHardware {
         parameters.loggingEnabled = false;
         robotTracker.initialize(parameters);
         robotTracker.startAccelerationIntegration(new Position(), new Velocity(), 10);*/
-        turretController = new PIDController(0.01, 0, 0, 0, new Func<Double>() {
+        turretController = new PIDController(0.07, 0, 0, 0.05, new Func<Double>() {
             @Override
             public Double value() {
-                return (turretRotation.getCurrentPosition() / ENCODER_COUNTS_PER_TURRET_DEGREE) - turretGyro.getIntegratedZValue();
+                return (turretRotation.getCurrentPosition() / ENCODER_COUNTS_PER_TURRET_DEGREE - turretGyro.getIntegratedZValue());
             }
         }, null);
 
@@ -206,9 +232,11 @@ public class RobotHardware {
         return rightDrive;
     }
 
-    public SyncedDcMotors getShooter() {
-        return shooter;
+    public DcMotor getShooterLeft() {
+        return shooterLeft;
     }
+
+    public DcMotor getShooterRight() { return shooterRight;}
 
     public DcMotor getIntake() {
         return intake;
@@ -225,36 +253,15 @@ public class RobotHardware {
         double turretSpeed;
 
         if (trackingOn) {
-
-            turretController.setSetPoint(turretController.getSetPoint() + joystickInput / 10);
-            turretSpeed = -turretController.sendPIDOutput();
+            turretController.setSetPoint(turretController.getSetPoint() + joystickInput * 2);
+            turretSpeed = turretController.sendPIDOutput();
 
         } else {
             turretSpeed = joystickInput;
             turretController.setSetPoint(turretController.getSourceVal());
         }
 
-        /*if (turretRotation.getCurrentPosition() > RobotHardware.TURRET_ENCODER_COUNT_REVOLUTION_LIMIT) {
-            turretSpeed = Range.clip(turretSpeed, -1, 0);
-            if (turretError > 10) {
-                turretHeadingTarget += 360;
-                //turretSpeed = -1;
-            }
-
-        } else if (turretRotation.getCurrentPosition() < -RobotHardware.TURRET_ENCODER_COUNT_REVOLUTION_LIMIT) {
-            turretSpeed = Range.clip(turretSpeed, 0, 1);
-            if (turretError < -10) {
-                turretHeadingTarget -= 360;
-                // turretSpeed = 1;
-            }
-        }*/
-
         turretRotation.setPower(turretSpeed);
-
-       /* telemetry.addData("Turret Heading Current|Target", turretGyro.getIntegratedZValue() + "|" + turretHeadingTarget);
-        telemetry.addData("Turret Error", turretError);
-        telemetry.addData("Turret Speed", turretSpeed);
-        telemetry.addData("Turret Counts", turretRotation.getCurrentPosition());*/
     }
 
     @Deprecated
@@ -272,6 +279,10 @@ public class RobotHardware {
 
     public ColorSensor getRightButtonPusherColorSensor() {
         return rightButtonPusherColorSensor;
+    }
+
+    public ModernRoboticsI2cColorSensor getLoaderColorSensor() {
+        return loaderColorSensor;
     }
 
     @Deprecated
@@ -296,10 +307,10 @@ public class RobotHardware {
     /**
      * This method will operate the button pusher servo to push the beacon.
      *
-     * @param beaconState encodes the state of the beacon.  If one side is undefined,
-     *                    it will assume that side is the opposite of the defined side.
-     *                    If UNDEFINED is passed, it will return to the center position.
-     * @param alliance    stores what alliance we are, valid parameters are BLUE and RED
+     * @param beaconState      encodes the state of the beacon.  If one side is undefined,
+     *                         it will assume that side is the opposite of the defined side.
+     *                         If UNDEFINED is passed, it will return to the center position.
+     * @param alliance         stores what alliance we are, valid parameters are BLUE and RED
      * @param percentExtension is what percent of the button pusher's range will be used.
      */
     public void pushButton(BeaconState beaconState, BeaconState alliance, double percentExtension) {
@@ -321,7 +332,7 @@ public class RobotHardware {
                 } else if (beaconState == BLUE_BLUE) {
                     buttonPusherServo.setPosition(BUTTON_PUSHER_CENTER_POSITION);
                 } else if (beaconState == RED_RED) {
-                    buttonPusherServo.setPosition(BUTTON_PUSHER_RIGHT_POSITION);
+                    buttonPusherServo.setPosition(BUTTON_PUSHER_LEFT_POSITION);
                 }
             } else if (alliance == RED) {
                 if (beaconState == BLUE_RED) {
@@ -329,7 +340,7 @@ public class RobotHardware {
                 } else if (beaconState == RED_BLUE) {
                     buttonPusherServo.setPosition(BUTTON_PUSHER_LEFT_POSITION);
                 } else if (beaconState == BLUE_BLUE) {
-                    buttonPusherServo.setPosition(BUTTON_PUSHER_RIGHT_POSITION);
+                    buttonPusherServo.setPosition(BUTTON_PUSHER_LEFT_POSITION);
                 } else if (beaconState == RED_RED) {
                     buttonPusherServo.setPosition(BUTTON_PUSHER_CENTER_POSITION);
                 }
@@ -358,6 +369,24 @@ public class RobotHardware {
         pushButton(beaconState, BLUE);
     }
 
+    public void deregisterBeaconColorSensors() {
+        leftButtonPusherColorSensor.getI2cController().deregisterForPortReadyCallback(leftButtonPusherColorSensor.getPort());
+        rightButtonPusherColorSensor.getI2cController().deregisterForPortReadyCallback(rightButtonPusherColorSensor.getPort());
+    }
+
+    public void registerBeaconColorSensors() {
+        leftButtonPusherColorSensor.getI2cController().registerForI2cPortReadyCallback(leftButtonPusherColorSensor, leftButtonPusherColorSensor.getPort());
+        rightButtonPusherColorSensor.getI2cController().registerForI2cPortReadyCallback(rightButtonPusherColorSensor, rightButtonPusherColorSensor.getPort());
+    }
+
+    public void deregisterLoaderColorSensor() {
+        loaderColorSensor.getI2cController().deregisterForPortReadyCallback(loaderColorSensor.getPort());
+    }
+
+    public void registerLoaderColorSensor() {
+        loaderColorSensor.getI2cController().registerForI2cPortReadyCallback(loaderColorSensor, loaderColorSensor.getPort());
+    }
+
     /**
      * Will check the color sensors to determine the beacon state
      * If either color sensor's state is UNDEFINED, then this method will return UNDEFINED.
@@ -371,8 +400,49 @@ public class RobotHardware {
         return BeaconState.mergeBeaconStates(leftSide, rightSide);
     }
 
+    public BeaconState findParticleColor() { //unfortunately, a blue ball returns equal values for blue and green
+        RobotHardware.BeaconState colorState = UNDEFINED;
+
+        /*if (loaderColorSensor.red() > loaderColorSensor.blue() + 5 && loaderColorSensor.alpha() > 10) {
+            colorState = RED;
+        } else if (loaderColorSensor.blue() > loaderColorSensor.red() + 5 && loaderColorSensor.alpha() > 10) {
+            colorState = BLUE;
+        }*/
+
+        int colorNumber = getLoaderColorNumber();
+
+        if (colorNumber > 0 && colorNumber < 16 && colorNumber != 14) { //reason tests
+            if (colorNumber < 7 || colorNumber == 15) {
+                colorState = BLUE;
+            } else if (colorNumber > 8 || colorNumber == 13) {
+                colorState = RED;
+            }
+        }
+
+        return colorState;
+    }
+
+    public int getLoaderColorNumber() {
+        I2cController controller = loaderColorSensor.getI2cController();
+
+        byte color = -1;
+        Lock readLock = controller.getI2cReadCacheLock(loaderColorSensor.getPort());
+        byte[] readBuffer = controller.getI2cReadCache(loaderColorSensor.getPort());
+        try {
+            readLock.lock();
+            color = readBuffer[ModernRoboticsI2cColorSensor.OFFSET_COLOR_NUMBER];
+        } finally {
+            readLock.unlock();
+        }
+
+        if (color == -1)
+            return color;
+        return TypeConversion.unsignedByteToInt(color);
+    }
+
     /**
      * Checks the state of the color sensor to determine what color is being read
+     *
      * @param colorSensor the color sensor that will be checked
      * @return A BeaconState, which will be either RED, BLUE, or UNDEFINED.
      */
@@ -389,7 +459,6 @@ public class RobotHardware {
 
         return colorState;
     }
-
 
 
     public void setLoaderPower(double power) {

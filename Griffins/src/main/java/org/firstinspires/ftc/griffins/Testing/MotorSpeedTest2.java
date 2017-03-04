@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.griffins.Testing;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsUsbDcMotorController;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -19,8 +20,8 @@ import java.util.Iterator;
 /**
  * Created by David on 10/22/2016.
  */
-@TeleOp
-//@Disabled
+@TeleOp(group = "test")
+@Disabled
 public class MotorSpeedTest2 extends LinearOpMode implements FtcMenu.MenuButtonsAndDashboard {
 
     public static final int DEFAULT_RATE_TRACKING_WINDOW = 2000; // In milliseconds

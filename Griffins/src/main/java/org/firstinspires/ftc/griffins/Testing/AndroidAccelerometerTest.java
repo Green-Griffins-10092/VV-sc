@@ -23,7 +23,7 @@ import java.util.List;
  * Created by David on 11/20/2016.
  */
 
-@TeleOp(name = "Android Accelerometer Test", group = "accel")
+@TeleOp(name = "Android Accelerometer Test", group = "test")
 @Disabled
 public class AndroidAccelerometerTest extends OpMode implements SensorEventListener {
 

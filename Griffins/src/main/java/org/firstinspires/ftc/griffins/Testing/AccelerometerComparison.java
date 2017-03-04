@@ -21,7 +21,7 @@ import java.util.List;
  * Created by David on 11/20/2016.
  */
 
-@TeleOp(name = "Accelerometer Comparison", group = "accel")
+@TeleOp(name = "Accelerometer Comparison", group = "test")
 @Disabled
 public class AccelerometerComparison extends OpMode implements SensorEventListener {
 

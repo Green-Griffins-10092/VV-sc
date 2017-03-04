@@ -8,20 +8,60 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.griffins.Navigation.LinearOpModeTimeOutFunc;
 import org.firstinspires.ftc.griffins.Navigation.PIDDrive;
+import org.firstinspires.ftc.griffins.Navigation.PIDRate;
 
 /**
  * Created by David on 11/28/2016.
  */
 
 public class AutoFunctions {
+    public static double[] scanningSpeeds = {0.05, 0.15};
     private LinearOpMode linearOpMode;
     private RobotHardware hardware;
     private PIDDrive drive;
+    private PIDRate rate;
 
     public AutoFunctions(RobotHardware hardware, LinearOpMode linearOpMode) {
         this.hardware = hardware;
         this.linearOpMode = linearOpMode;
         drive = new PIDDrive(hardware);
+        rate = new PIDRate(hardware);
+    }
+
+    public void wallDrive(double signedPower) {
+        double powerRatio = 0.2 / 0.25;
+
+        hardware.setDrivePower(signedPower, signedPower * powerRatio);
+    }
+
+    private double determineDrivePower(DriveStraightDirection defaultDirection) {
+        RobotHardware.BeaconState beaconState = hardware.findBeaconState();
+
+        double drivePower = 0;
+
+        if (beaconState.containsUndefined()) {
+            if (beaconState == RobotHardware.BeaconState.UNDEFINED_UNDEFINED) {
+                drivePower = scanningSpeeds[1] * (defaultDirection == DriveStraightDirection.FORWARD ? 1 : -1);
+
+            } else {
+                drivePower = scanningSpeeds[0] * (defaultDirection == DriveStraightDirection.FORWARD ? 1 : -1);
+            }
+        }
+
+        return drivePower;
+    }
+
+    public void scanForBeacon(DriveStraightDirection defaultDirection) {
+        double drivePower = determineDrivePower(defaultDirection);
+        double lastDrivePower = drivePower;
+
+        while (linearOpMode.opModeIsActive() && drivePower != 0) {
+            lastDrivePower = drivePower;
+            wallDrive(drivePower);
+            drivePower = determineDrivePower(defaultDirection);
+        }
+
+        hardware.stopDrive();
     }
 
     public void oneWheelTurn(DcMotor turningMotor, double angle) throws InterruptedException {
@@ -290,17 +330,28 @@ public class AutoFunctions {
         hardware.getRightDrive().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
+    public void pushBeacon(RobotHardware.BeaconState alliance) {
+        if (linearOpMode.opModeIsActive()) {
+            hardware.pushButton(hardware.findBeaconState(), alliance);
+            linearOpMode.sleep(1900);
+            hardware.pushButton(RobotHardware.BeaconState.UNDEFINED, alliance);
+            linearOpMode.sleep(700);
+        }
+    }
+
     public void shoot() {
-        hardware.getShooter().setPower(0.8);
-        linearOpMode.sleep(500);
-        hardware.setLoaderPower(1.0);
-        linearOpMode.sleep(1000);
-        hardware.setLoaderPower(0);
-        linearOpMode.sleep(500);
-        hardware.setLoaderPower(1);
-        linearOpMode.sleep(1000);
-        hardware.getShooter().setPower(0.0);
-        hardware.setLoaderPower(0.0);
+        if (linearOpMode.opModeIsActive()) {
+            rate.setRateTarget(.77);
+            linearOpMode.sleep(500);
+            hardware.setLoaderPower(1.0);
+            linearOpMode.sleep(1000);
+            hardware.setLoaderPower(0);
+            linearOpMode.sleep(500);
+            hardware.setLoaderPower(1);
+            linearOpMode.sleep(1000);
+            rate.setRateTarget(.77);
+            hardware.setLoaderPower(0.0);
+        }
     }
 
     public float getZAngle(){
@@ -308,22 +359,48 @@ public class AutoFunctions {
         return hardware.getTurretGyro().getIntegratedZValue();
     }
 
-    public void driveStraightPID(double inches, DriveStraightDirection direction, double timeoutSeconds) {
+    public void driveStraightPID(double inches, DriveStraightDirection direction, double timeoutSeconds, boolean quickExit) {
         drive.setDriveTarget(inches * (direction == DriveStraightDirection.FORWARD ? 1 : -1));
         drive.driveToTarget(new LinearOpModeTimeOutFunc(linearOpMode, timeoutSeconds), linearOpMode.telemetry);
     }
 
-    public void driveStraightPID(double inches, DriveStraightDirection direction) {
-        driveStraightPID(inches, direction, 8);
+    public void driveStraightPID(double inches, DriveStraightDirection direction, boolean quickExit) {
+        driveStraightPID(inches, direction, 8, quickExit);
     }
 
-    public String twoWheelTurnPID(double degrees, TurnDirection direction, double timeoutSeconds) {
+    public void driveStraightPID(double inches, DriveStraightDirection direction) {
+        driveStraightPID(inches, direction, 8, false);
+    }
+
+    public void driveStraightPID(double inches, DriveStraightDirection direction, double timeoutSeconds) {
+        driveStraightPID(inches, direction, timeoutSeconds, false);
+    }
+
+    public String twoWheelTurnPID(double degrees, TurnDirection direction, double timeoutSeconds, boolean quickExit) {
         drive.setTurnTarget(degrees * (direction == TurnDirection.LEFT ? 1 : -1));
-        return drive.driveToTarget(new LinearOpModeTimeOutFunc(linearOpMode, timeoutSeconds), linearOpMode.telemetry);
+        return drive.driveToTarget(new LinearOpModeTimeOutFunc(linearOpMode, timeoutSeconds), linearOpMode.telemetry, quickExit);
+    }
+
+    public String twoWheelTurnPID(double degrees, TurnDirection direction, boolean quickExit) {
+        return twoWheelTurnPID(degrees, direction, 5, quickExit);
     }
 
     public String twoWheelTurnPID(double degrees, TurnDirection direction) {
-        return twoWheelTurnPID(degrees, direction, 5);
+        return twoWheelTurnPID(degrees, direction, 5, false);
+    }
+
+    public String twoWheelTurnPID(double degrees, TurnDirection direction, double timeoutSeconds) {
+        return twoWheelTurnPID(degrees, direction, timeoutSeconds, false);
+    }
+
+    public String shootPID(double rps) {
+        rate.setRateTarget(rps);
+        return rate.spinToTarget(new LinearOpModeTimeOutFunc(linearOpMode, 5), linearOpMode.telemetry, false);
+    }
+
+    public void wallPIDDrive(double inches, DriveStraightDirection direction, double timeoutSeconds) {
+        drive.setDriveTarget(inches * (direction == DriveStraightDirection.FORWARD ? 1 : -1));
+        drive.wallDriveToTarget(new LinearOpModeTimeOutFunc(linearOpMode, timeoutSeconds));
     }
 
     public enum DriveStraightDirection {FORWARD, BACKWARD}

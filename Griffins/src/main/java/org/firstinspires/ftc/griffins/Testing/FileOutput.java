@@ -8,6 +8,7 @@ import java.io.File;
 
 /**
  * Created by David on 1/23/2017.
+ * class for easy file output for testing purposes
  */
 
 public class FileOutput {

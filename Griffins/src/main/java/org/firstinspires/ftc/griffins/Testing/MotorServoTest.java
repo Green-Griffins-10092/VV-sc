@@ -25,7 +25,7 @@ import com.qualcomm.robotcore.util.Range;
  * right y axis changes position
  */
 
-@TeleOp(name = "Motor and Servo Tester", group = "user")
+@TeleOp(name = "Motor and Servo Tester", group = "test")
 @Disabled
 public class MotorServoTest extends OpMode {
 
@@ -52,7 +52,8 @@ public class MotorServoTest extends OpMode {
 
         for (DcMotor motor :
                 hardwareMap.dcMotor) {
-            motor.setPowerFloat();
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            motor.setPower(0);
         }
 
         //servos do not have a float method

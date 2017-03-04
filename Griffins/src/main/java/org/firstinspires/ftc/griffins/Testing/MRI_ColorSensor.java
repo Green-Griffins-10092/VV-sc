@@ -25,7 +25,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
-@TeleOp(name = "color sensor test", group = "user")
+@TeleOp(name = "color sensor test", group = "test")
 @Disabled
 public class MRI_ColorSensor extends LinearOpMode {
 

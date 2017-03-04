@@ -58,6 +58,9 @@
         <ColorSensor
             name="colorR"
             port="2"/>
+        <ColorSensor
+            name="intake color"
+            port="3"/>
     </DeviceInterfaceModule>
     <MotorController
         name="Motor Controller R"

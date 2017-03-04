@@ -4,20 +4,27 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.griffins.RobotHardware.BeaconState;
 
+import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.BLUE;
+import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.BLUE_RED;
+import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.RED;
+import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.RED_BLUE;
+import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.UNDEFINED;
+
 /**
  * Created by David on 11/26/2016.
  */
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp
-public class TeleOp extends OpMode {
+public abstract class TeleOp extends OpMode {
 
+    protected BeaconState alliance;
     private RobotHardware hardware;
-    private boolean buttonToggle;
-    private boolean turretState;
 
     @Override
     public void init() {
         hardware = new RobotHardware();
         hardware.initialize(hardwareMap);
+
+        hardware.registerBeaconColorSensors();
+        hardware.registerLoaderColorSensor();
 
         gamepad1.setJoystickDeadzone(0.1f);
         gamepad2.setJoystickDeadzone(0.1f);
@@ -33,8 +40,6 @@ public class TeleOp extends OpMode {
         super.start();
         this.resetStartTime();
         hardware.startTurretTracking();
-        buttonToggle = gamepad2.x;
-        turretState = false;
     }
 
     @Override
@@ -46,105 +51,124 @@ public class TeleOp extends OpMode {
         double loaderPower;
         double targetTurretSpeed;
         BeaconState beaconPushState;
-        BeaconState alliance = BeaconState.BLUE;
         double beaconPushRatio;
-        boolean turretTracking;
+        boolean turretState;
+        String particle;
 
-        /*if (!buttonToggle && gamepad2.y)
-            turretState = !turretState;
-        buttonToggle = gamepad2.y;*/
 
-        rightDrivePower = Math.pow(-gamepad1.right_stick_y, 3);
-        leftDrivePower = Math.pow(-gamepad1.left_stick_y, 3);
+        { //gamepad 1 controls
+            rightDrivePower = Math.pow(-gamepad1.right_stick_y, 3);
+            leftDrivePower = Math.pow(-gamepad1.left_stick_y, 3);
 
-        intakeSpeed = gamepad1.left_trigger - gamepad1.right_trigger;
+            intakeSpeed = gamepad1.left_trigger - gamepad1.right_trigger;
 
-        if (gamepad1.right_bumper) {
-            rightDrivePower = leftDrivePower * .4;
-            leftDrivePower *= .5;
-        }
-
-        if (gamepad1.left_bumper) {
-            rightDrivePower = .20;
-            leftDrivePower = .20;
-        }
-
-        if (gamepad2.left_bumper) {
-            loaderPower = -1.0;
-        } else if (gamepad2.left_trigger != 0) {
-            loaderPower = 1;
-        } else {
-            loaderPower = 0;
-        }
-
-        if (gamepad2.right_bumper) {
-            shooterPower = 1;
-        } else if (gamepad2.right_trigger >= 0.5) {
-            shooterPower = 0.75;
-        } else if (gamepad2.left_bumper) {
-            shooterPower = -0.7;
-        } else {
-            shooterPower = 0;
-        }
-
-        double currentTurretSpeed = hardware.getTurretRotation().getPower();
-        targetTurretSpeed = gamepad2.left_stick_x;
-        /*if (Math.abs(targetTurretSpeed) < 0.2) {
-            currentTurretSpeed = targetTurretSpeed;
-        } else {
-            if (Math.signum(targetTurretSpeed) != Math.signum(currentTurretSpeed)) {
-                currentTurretSpeed = 0;
+            if (gamepad1.right_bumper || gamepad1.left_bumper) {
+                leftDrivePower *= .7;
+                rightDrivePower = leftDrivePower * 0.9;
             }
 
-            if (Math.abs(currentTurretSpeed - targetTurretSpeed) <= 0.05) {
-                currentTurretSpeed = targetTurretSpeed;
+        } //end gamepad 1 controls
+
+
+        { //gamepad 2 controls
+            RobotHardware.BeaconState ball = hardware.findParticleColor();
+            if (gamepad2.a) {
+                if (ball == alliance) {
+                    loaderPower = 1;
+                    intakeSpeed = 1;
+                } else if (ball == UNDEFINED) {
+                    loaderPower = 0;
+                } else {
+                    loaderPower = -1;
+                    intakeSpeed = -1;
+                }
             } else {
-                currentTurretSpeed = currentTurretSpeed + Math.signum(targetTurretSpeed - currentTurretSpeed) * 0.05;
+                if (gamepad2.left_bumper) {
+                    loaderPower = -1.0;
+                } else if (gamepad2.left_trigger != 0) {
+                    loaderPower = 1;
+                } else {
+                    loaderPower = 0;
+                }
             }
-        }*/
-        targetTurretSpeed = Math.pow(targetTurretSpeed, 3) / 3;
 
-        if (gamepad2.x) {
-            alliance = BeaconState.BLUE;
-            beaconPushState = hardware.findBeaconState();
-            beaconPushRatio = 1;
-        } else if (gamepad2.b) {
-            alliance = BeaconState.RED;
-            beaconPushState = hardware.findBeaconState();
-            beaconPushRatio = 1;
-        } else if (gamepad2.right_stick_x < -0.1) {
-            beaconPushState = BeaconState.BLUE_RED;
-            beaconPushRatio = -gamepad2.right_stick_x;
-        } else if (gamepad2.right_stick_x > 0.1) {
-            beaconPushState = BeaconState.RED_BLUE;
-            beaconPushRatio = gamepad2.right_stick_x;
-        } else {
-            beaconPushState = BeaconState.UNDEFINED;
-            beaconPushRatio = RobotHardware.BUTTON_PUSHER_RATIO;
-        }
+            if (ball == RED) {
+                particle = "Red Particle";
+            } else if (ball == BLUE) {
+                particle = "Blue Particle";
+            } else {
+                particle = "No Particle";
+            }
 
-        hardware.setDrivePower(leftDrivePower, rightDrivePower);
-        hardware.getShooter().setPower(shooterPower);
-        hardware.getIntake().setPower(intakeSpeed);
-        hardware.setLoaderPower(loaderPower);
-        hardware.pushButton(beaconPushState, alliance, beaconPushRatio);
-        hardware.setTurretRotation(targetTurretSpeed, turretState);
+            if (gamepad2.right_bumper) {
+                shooterPower = 0.70;
+            } else if (gamepad2.right_trigger >= 0.5) {
+                shooterPower = 0.75;
+            } else if (gamepad2.left_bumper) {
+                shooterPower = -0.7;
+            } else {
+                shooterPower = 0;
+            }
 
-        int time = (int) getRuntime();
+            targetTurretSpeed = gamepad2.left_stick_x;
+            targetTurretSpeed = Math.pow(targetTurretSpeed, 3);
+            if (!gamepad2.left_stick_button) {
+                targetTurretSpeed /= 3;
+            }
+            turretState = false; //!gamepad2.left_stick_button && shooterPower == 0;
 
-        telemetry.addData("Time(current:remaining)", time + ":" + (120 - time));
-        telemetry.addData("Left Drive Speed", leftDrivePower);
-        telemetry.addData("Right Drive Speed", rightDrivePower);
-        telemetry.addData("Intake Speed", intakeSpeed);
-        telemetry.addData("Loader Speed", loaderPower);
-        telemetry.addData("Shooter Speed", shooterPower);
-        telemetry.addData("gamepad 1", gamepad1);
-        telemetry.addData("gamepad 2", gamepad2);
-        telemetry.addData("left sensor data(a b r g)", hardware.getLeftButtonPusherColorSensor().alpha() + " " +
-                hardware.getLeftButtonPusherColorSensor().blue() + " " + hardware.getLeftButtonPusherColorSensor().red() +
-                " " + hardware.getLeftButtonPusherColorSensor().green());
-        telemetry.addData("Right sensor data(a b r g)", hardware.getRightButtonPusherColorSensor().alpha() + " " +
-                hardware.getRightButtonPusherColorSensor().blue() + " " + hardware.getRightButtonPusherColorSensor().red() +
-                " " + hardware.getRightButtonPusherColorSensor().green());
+            if (gamepad2.x || gamepad2.b || gamepad2.right_stick_button) {
+                beaconPushState = hardware.findBeaconState();
+                beaconPushRatio = 1;
+            } else if (gamepad2.right_stick_x < -0.1) {
+                beaconPushState = alliance == RED ? RED_BLUE : BLUE_RED;
+                beaconPushRatio = -gamepad2.right_stick_x;
+            } else if (gamepad2.right_stick_x > 0.1) {
+                beaconPushState = alliance == RED ? BLUE_RED : RED_BLUE;
+                beaconPushRatio = gamepad2.right_stick_x;
+            } else {
+                beaconPushState = BeaconState.UNDEFINED;
+                beaconPushRatio = RobotHardware.BUTTON_PUSHER_RATIO;
+            }
+        } //end gamepad 2 controls
+
+
+        { //send hardware commands
+            hardware.setDrivePower(leftDrivePower, rightDrivePower);
+            hardware.getShooterLeft().setPower(shooterPower);
+            hardware.getShooterRight().setPower(shooterPower);
+            hardware.getIntake().setPower(intakeSpeed);
+            hardware.setLoaderPower(loaderPower);
+            hardware.pushButton(beaconPushState, alliance, beaconPushRatio);
+            hardware.setTurretRotation(targetTurretSpeed, turretState);
+        } //end send hardware commands
+
+
+        { //send telemetry commands
+            int time = (int) getRuntime();
+            telemetry.addData("Time(current:remaining)", time + ":" + (120 - time));
+            telemetry.addData("Particle Being Loaded", particle);
+            telemetry.addData("Left Drive Speed", leftDrivePower);
+            telemetry.addData("Right Drive Speed", rightDrivePower);
+            telemetry.addData("Intake Speed", intakeSpeed);
+            telemetry.addData("Loader Speed", loaderPower);
+            telemetry.addData("Shooter Speed", shooterPower);
+            telemetry.addData("gamepad 1", gamepad1);
+            telemetry.addData("gamepad 2", gamepad2);
+            telemetry.addData("left sensor data(a b r g)", hardware.getLeftButtonPusherColorSensor().alpha() + " " +
+                    hardware.getLeftButtonPusherColorSensor().blue() + " " + hardware.getLeftButtonPusherColorSensor().red() +
+                    " " + hardware.getLeftButtonPusherColorSensor().green());
+            telemetry.addData("Right sensor data(a b r g)", hardware.getRightButtonPusherColorSensor().alpha() + " " +
+                    hardware.getRightButtonPusherColorSensor().blue() + " " + hardware.getRightButtonPusherColorSensor().red() +
+                    " " + hardware.getRightButtonPusherColorSensor().green());
+            telemetry.addData("Loader sensor data(a b r g)", hardware.getLoaderColorSensor().alpha() + " " +
+                    hardware.getLoaderColorSensor().blue() + " " + hardware.getLoaderColorSensor().red() +
+                    " " + hardware.getLoaderColorSensor().green());
+        } //end send telemetry commands
+    }
+
+    @Override
+    public void stop() {
+        hardware.pushButton(BeaconState.UNDEFINED);
     }
 }
