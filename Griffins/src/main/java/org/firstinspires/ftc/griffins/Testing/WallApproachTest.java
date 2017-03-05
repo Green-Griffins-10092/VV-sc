@@ -19,7 +19,7 @@ public class WallApproachTest extends LinearOpMode {
 
         hardware.registerBeaconColorSensors();
 
-        autoFunctions.driveStraightPID(25, AutoFunctions.DriveStraightDirection.BACKWARD, 1.5, true);
+        autoFunctions.driveStraightPID(24, AutoFunctions.DriveStraightDirection.BACKWARD, 1.5, true);
 
         //autoFunctions.twoWheelTurnPID(5, AutoFunctions.TurnDirection.RIGHT, 2, true);
 

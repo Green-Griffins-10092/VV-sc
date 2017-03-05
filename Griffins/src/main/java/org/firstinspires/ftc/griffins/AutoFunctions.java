@@ -339,9 +339,9 @@ public class AutoFunctions {
         }
     }
 
-    public void shoot() {
-        if (linearOpMode.opModeIsActive()) {
-            rate.setRateTarget(.77);
+    public void shoot(){
+        if (linearOpMode.opModeIsActive()){
+            hardware.getShooter().setPower(.77);
             linearOpMode.sleep(500);
             hardware.setLoaderPower(1.0);
             linearOpMode.sleep(1000);
@@ -349,7 +349,20 @@ public class AutoFunctions {
             linearOpMode.sleep(500);
             hardware.setLoaderPower(1);
             linearOpMode.sleep(1000);
-            rate.setRateTarget(.77);
+            hardware.getShooter().setPower(0.0);
+            hardware.setLoaderPower(0.0);
+        }
+    }
+
+    public void shootPID() {
+        if (linearOpMode.opModeIsActive()) {
+            rate.setRateTarget(7);
+            linearOpMode.sleep(500);
+            hardware.setLoaderPower(1.0);
+            linearOpMode.sleep(2000);
+            hardware.setLoaderPower(0.0);
+            linearOpMode.sleep(500);
+            rate.setRateTarget(0);
             hardware.setLoaderPower(0.0);
         }
     }
@@ -393,9 +406,8 @@ public class AutoFunctions {
         return twoWheelTurnPID(degrees, direction, timeoutSeconds, false);
     }
 
-    public String shootPID(double rps) {
-        rate.setRateTarget(rps);
-        return rate.spinToTarget(new LinearOpModeTimeOutFunc(linearOpMode, 5), linearOpMode.telemetry, false);
+    public String shootPIDtoString(double rps) {
+        return rate.spinToTarget(new LinearOpModeTimeOutFunc(linearOpMode, 10), linearOpMode.telemetry, false);
     }
 
     public void wallPIDDrive(double inches, DriveStraightDirection direction, double timeoutSeconds) {

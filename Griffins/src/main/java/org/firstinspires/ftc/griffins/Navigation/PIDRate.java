@@ -23,12 +23,12 @@ public class PIDRate {
     }
 
     public void init() {
-        pidRate = new PIDController(1, 0, 0, 5, new Func<Double>() {
+        pidRate = new PIDController(.1, 0, 0, .08, 5, new Func<Double>() {
             @Override
             public Double value() {
                 return (double) (hardware.getShooterLeft().getCurrentPosition() + hardware.getShooterRight().getCurrentPosition()) / 2;
             }
-        }, null);
+        }, hardware.getShooter());
         pidRateDifference = new PIDController(0, 0, 0, 1, new Func<Double>() {
             @Override
             public Double value() {
@@ -38,9 +38,10 @@ public class PIDRate {
     }
 
     public void setRateTarget(double ecps){
-        pidRate.setSetPoint(pidRate.getSourceVal() + ecps);
+        pidRate.setSetPoint(ecps);
+        hardware.getShooterLeft().setPower(-pidRate.sendPIDOutput());
+        hardware.getShooterRight().setPower(pidRate.sendPIDOutput());
         pidRateDifference.setSetPoint(pidRateDifference.getSourceVal());
-        syncRates();
     }
 
     public void syncRates(){
@@ -51,7 +52,7 @@ public class PIDRate {
         difference = pidRateDifference.sendPIDOutput();
 
         hardware.getShooterLeft().setTargetPosition((int)(ecps + difference));
-        hardware.getShooterLeft().setTargetPosition((int)(ecps - difference));
+        hardware.getShooterRight().setTargetPosition((int)(ecps - difference));
     }
 
     public String spinToTarget(Func<Boolean> earlyExitCheck, Telemetry telemetry, boolean quickExit) {
@@ -66,25 +67,27 @@ public class PIDRate {
         }
 
         int exitCounter = 0;
-        do {
-            syncRates();
+        //do {
+            setRateTarget(7);
             String error;
+        while (exitCounter < exitValue && earlyExitCheck.value()) {
                 if (pidRate.isOnTarget()) {
                     exitCounter++;
                 } else {
                     exitCounter = 0;
                 }
 
-                error = pidRate.getError() + " \n";
+            error = hardware.getShooter().getCurrentPosition() + " \n";
 
             if (System.currentTimeMillis() != lastTime) {
                 lastTime = System.currentTimeMillis();
                 builder.append(lastTime).append(", ").append(error);
             }
-        } while (exitCounter < exitValue && earlyExitCheck.value());
-
+           // }
+        }
 
         return builder.toString();
     }
 
 }
+

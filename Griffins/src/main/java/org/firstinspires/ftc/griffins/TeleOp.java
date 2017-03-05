@@ -135,8 +135,7 @@ public abstract class TeleOp extends OpMode {
 
         { //send hardware commands
             hardware.setDrivePower(leftDrivePower, rightDrivePower);
-            hardware.getShooterLeft().setPower(shooterPower);
-            hardware.getShooterRight().setPower(shooterPower);
+            hardware.getShooter().setPower(shooterPower);
             hardware.getIntake().setPower(intakeSpeed);
             hardware.setLoaderPower(loaderPower);
             hardware.pushButton(beaconPushState, alliance, beaconPushRatio);

@@ -13,28 +13,19 @@ import org.firstinspires.ftc.griffins.RobotHardware;
  * Created by David on 12/20/2016.
  */
 @Autonomous(group = "test")
-@Disabled
 public class PIDShootingTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         RobotHardware robot = new RobotHardware();
-        PIDRate rate = new PIDRate(robot);
         robot.initialize(hardwareMap);
         AutoFunctions autoFunctions = new AutoFunctions(robot, this);
 
         waitForStart();
 
-        String string = autoFunctions.shootPID(.77);
-        log("finished shot 1");
-        FileOutput.outputFile("shot1.csv", string);
-        sleep(2000);
-        string = autoFunctions.shootPID(.77);
-        FileOutput.outputFile("shot2.csv", string);
-        log("finished shot 2");
-        sleep(2000);
-        string = autoFunctions.shootPID(.77);
-        FileOutput.outputFile("shot3.csv", string);
-        log("finished shot 3");
+       String string = autoFunctions.shootPIDtoString(7);
+        log("finished shot");
+        FileOutput.outputFile("liveShootingData.csv", string);
+
     }
 
     public void log(String message) {

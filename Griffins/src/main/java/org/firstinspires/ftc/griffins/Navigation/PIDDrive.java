@@ -61,6 +61,7 @@ public class PIDDrive {
     public void syncDrives(){
         double power;
 
+
         if (isTurning) {
             power = pidTurning.sendPIDOutput();
             power = Range.clip(power, -0.4, 0.4);
@@ -69,7 +70,7 @@ public class PIDDrive {
             hardware.setDrivePower(-power - difference, power + difference);
         } else {
             power = pidDrive.sendPIDOutput();
-            power = Range.clip(power, -0.5, 0.5);
+            power = Range.clip(power, -0.6, 0.6);
             difference = pidDrivingDifference.sendPIDOutput();
 
             hardware.setDrivePower(power + difference, power - difference);
@@ -80,7 +81,7 @@ public class PIDDrive {
         if (!isTurning) {
             double power;
             power = pidDrive.sendPIDOutput();
-            power = Range.clip(power, -0.5, 0.5);
+            power = Range.clip(power, -0.6, 0.6);
             difference = Range.clip(pidDrivingDifference.sendPIDOutput(), 0, 0.5);
 
             hardware.setDrivePower(power, power * 0.90);
