@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.griffins.Navigation;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.Range;
-
 import org.firstinspires.ftc.griffins.RobotHardware;
 import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -49,7 +46,6 @@ public class PIDRate {
         double ecps;
 
         ecps = pidRate.sendPIDOutput();
-        ecps = Range.clip(ecps, -0.5, 0.5);
         difference = pidRateDifference.sendPIDOutput();
 
         hardware.getShooterLeft().setTargetPosition((int)(ecps + difference));
@@ -89,12 +85,16 @@ public class PIDRate {
 
             double rate = changeDist / changeTime;
 
-            builder.append(time).append(", ").append(rate);
+            builder.append(time).append(", ").append(rate).append("\n");
 
             lastTime = time;
             lastDist = dist;
 
-            Thread.sleep(1000);
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
 //            if (System.currentTimeMillis() != lastTime) {
 //                lastTime = System.currentTimeMillis();
 //                builder.append(lastTime).append(", ").append(error);

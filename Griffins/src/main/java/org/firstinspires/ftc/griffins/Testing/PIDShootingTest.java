@@ -1,12 +1,9 @@
 package org.firstinspires.ftc.griffins.Testing;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.griffins.AutoFunctions;
-import org.firstinspires.ftc.griffins.AutoFunctions.TurnDirection;
-import org.firstinspires.ftc.griffins.Navigation.PIDRate;
 import org.firstinspires.ftc.griffins.RobotHardware;
 
 /**
@@ -21,6 +18,8 @@ public class PIDShootingTest extends LinearOpMode {
         AutoFunctions autoFunctions = new AutoFunctions(robot, this);
 
         waitForStart();
+
+        robot.setLoaderPower(1);
 
        String string = autoFunctions.shootPIDtoString(7);
         log("finished shot");
