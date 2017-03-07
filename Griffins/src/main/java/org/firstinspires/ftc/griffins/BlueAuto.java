@@ -40,7 +40,7 @@ public class BlueAuto extends LinearOpMode implements FtcMenu.MenuButtonsAndDash
         telemetry.update();
 
         //drive straight a little to get off wall in order to turn
-        autoFunctions.driveStraightPID(25, AutoFunctions.DriveStraightDirection.FORWARD, 3);
+        autoFunctions.driveStraightPID(15, AutoFunctions.DriveStraightDirection.FORWARD, 3);
         telemetry.log().add("Off the Wall");
         telemetry.update();
 
@@ -99,13 +99,13 @@ public class BlueAuto extends LinearOpMode implements FtcMenu.MenuButtonsAndDash
         }
 
         //autoFunctions.twoWheelTurnPID(45, AutoFunctions.TurnDirection.LEFT, 0.5, true); //timer out
-        autoFunctions.wallPIDDrive(43, AutoFunctions.DriveStraightDirection.BACKWARD, 2);
+        autoFunctions.wallPIDDrive(40, AutoFunctions.DriveStraightDirection.BACKWARD, 2);
 
         autoFunctions.scanForBeacon(AutoFunctions.DriveStraightDirection.BACKWARD);
 
         hardware.setDrivePower(-0.2, -0.1);
 
-        sleep(400);
+        sleep(200);
         hardware.stopDrive();
 
         autoFunctions.pushBeacon(BeaconState.BLUE);

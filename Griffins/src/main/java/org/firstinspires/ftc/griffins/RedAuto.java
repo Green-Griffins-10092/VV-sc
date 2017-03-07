@@ -128,9 +128,9 @@ public class RedAuto extends LinearOpMode implements FtcMenu.MenuButtonsAndDashb
         }
 
         hardware.setDrivePower(-0.2, -0.3);
-        sleep(700);
-        hardware.setDrivePower(0, 0.5);
-        sleep(700);
+        sleep(800);
+        hardware.setDrivePower(0, 0.6);
+        sleep(800);
         hardware.setDrivePower(0.5, 0.3);
         sleep(2000);
         hardware.stopDrive();
