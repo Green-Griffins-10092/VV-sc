@@ -3,8 +3,6 @@ package org.firstinspires.ftc.griffins;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.griffins.MenuPort.FtcMenu;
-import org.firstinspires.ftc.griffins.MenuPort.HalDashboard;
 import org.firstinspires.ftc.griffins.RobotHardware.BeaconState;
 import org.firstinspires.ftc.griffins.Testing.WallApproachTest;
 
@@ -12,14 +10,9 @@ import org.firstinspires.ftc.griffins.Testing.WallApproachTest;
  * Created by David on 12/7/2016.
  */
 @Autonomous(name = "Red Beacon Auto", group = "Competition")
-public class RedAuto extends LinearOpMode implements FtcMenu.MenuButtonsAndDashboard {
-    HalDashboard halDashboard;
+public class RedAuto extends LinearOpMode {
     private RobotHardware hardware;
     private AutoFunctions autoFunctions;
-
-    public RedAuto() {
-        halDashboard = HalDashboard.getInstance(telemetry);
-    }
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -61,15 +54,6 @@ public class RedAuto extends LinearOpMode implements FtcMenu.MenuButtonsAndDashb
         angle -= autoFunctions.getZAngle();
 
         WallApproachTest.redWallApproach(hardware, autoFunctions, this, (int) angle);
-
-        /*BeaconScan.scanForBeacon(AutoFunctions.DriveStraightDirection.BACKWARD, hardware, this);
-        hardware.pushButton(hardware.findBeaconState(), BeaconState.RED);
-
-        sleep(2000);
-
-        hardware.pushButtonFullExtension(BeaconState.UNDEFINED, BeaconState.RED);
-        sleep(1000);*/
-
 
         autoFunctions.scanForBeacon(AutoFunctions.DriveStraightDirection.BACKWARD);
 
@@ -135,61 +119,6 @@ public class RedAuto extends LinearOpMode implements FtcMenu.MenuButtonsAndDashb
         sleep(2000);
         hardware.stopDrive();
 
-        /*//"parallel parking"
-        autoFunctions.curveDriveShort(-(long) (3 / hardware.INCHES_PER_ENCODER_COUNT), -(long) (12.5 / hardware.INCHES_PER_ENCODER_COUNT), .1, .9);
-        telemetry.log().add("Straightened out against wall");
-        telemetry.update();
-
-        //drive back to first beacon
-        autoFunctions.driveStraight((long)(34/hardware.INCHES_PER_ENCODER_COUNT), AutoFunctions.DriveStraightDirection.BACKWARD, .5);
-        telemetry.log().add("Arrived at first beacon");
-        telemetry.update();
-
-        //button pusher works its magic
-       if(opModeIsActive()){
-         hardware.pushButton(hardware.findBeaconState(), RobotHardware.BeaconState.RED_RED);
-       }
-        telemetry.log().add("Pushed first button");
-        telemetry.update();
-
-        //drive straight until in front of second beacon
-        autoFunctions.driveStraight((long)(50/hardware.INCHES_PER_ENCODER_COUNT), AutoFunctions.DriveStraightDirection.FORWARD, .5);
-        telemetry.log().add("Arrived at second beacon");
-        telemetry.update();
-
-        //button pusher works its magic pt 2
-        if(opModeIsActive()){
-            hardware.pushButton(hardware.findBeaconState(), RobotHardware.BeaconState.RED_RED);
-        }
-        telemetry.log().add("Pushed second button");
-        telemetry.update();*/
-
-    }
-
-    @Override
-    public boolean isMenuUpButton() {
-        return gamepad1.dpad_up;
-    }
-
-    @Override
-    public boolean isMenuDownButton() {
-        return gamepad1.dpad_down;
-    }
-
-    @Override
-    public boolean isMenuEnterButton() {
-        return gamepad1.a;
-    }
-
-    @Override
-    public boolean isMenuBackButton() {
-        return gamepad1.b;
-    }
-
-    @Override
-    public HalDashboard getHalDashboard() {
-        halDashboard.resetTelemetryForHalDashboard();
-        return halDashboard;
     }
 
     private enum Alliance {
