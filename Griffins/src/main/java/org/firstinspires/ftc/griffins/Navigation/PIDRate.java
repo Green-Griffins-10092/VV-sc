@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.griffins.Navigation;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.griffins.RobotHardware;
@@ -58,6 +59,7 @@ public class PIDRate {
     public String spinToTarget(Func<Boolean> earlyExitCheck, Telemetry telemetry, boolean quickExit) {
         StringBuilder builder = new StringBuilder();
         long lastTime = System.currentTimeMillis();
+        int lastDist = hardware.getShooter().getCurrentPosition();
 
         int exitValue;
         if (quickExit) {
@@ -68,8 +70,8 @@ public class PIDRate {
 
         int exitCounter = 0;
         //do {
-            setRateTarget(7);
-            String error;
+        setRateTarget(7);
+        String error;
         while (exitCounter < exitValue && earlyExitCheck.value()) {
                 if (pidRate.isOnTarget()) {
                     exitCounter++;
@@ -79,10 +81,24 @@ public class PIDRate {
 
             error = hardware.getShooter().getCurrentPosition() + " \n";
 
-            if (System.currentTimeMillis() != lastTime) {
-                lastTime = System.currentTimeMillis();
-                builder.append(lastTime).append(", ").append(error);
-            }
+            long time = System.currentTimeMillis();
+            int dist = hardware.getShooter().getCurrentPosition();
+
+            long changeTime = time - lastTime;
+            int changeDist = dist - lastDist;
+
+            double rate = changeDist / changeTime;
+
+            builder.append(time).append(", ").append(rate);
+
+            lastTime = time;
+            lastDist = dist;
+
+            Thread.sleep(1000);
+//            if (System.currentTimeMillis() != lastTime) {
+//                lastTime = System.currentTimeMillis();
+//                builder.append(lastTime).append(", ").append(error);
+//            }
            // }
         }
 
