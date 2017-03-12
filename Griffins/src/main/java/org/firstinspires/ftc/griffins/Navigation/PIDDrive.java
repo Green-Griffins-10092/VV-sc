@@ -69,7 +69,7 @@ public class PIDDrive {
             hardware.setDrivePower(-power - difference, power + difference);
         } else {
             power = pidDrive.sendPIDOutput();
-            power = Range.clip(power, -0.5, 0.5);
+            power = Range.clip(power, -0.6, 0.6);
             difference = pidDrivingDifference.sendPIDOutput();
 
             hardware.setDrivePower(power + difference, power - difference);
