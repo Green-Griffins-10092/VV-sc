@@ -38,7 +38,7 @@ public class RedAuto extends LinearOpMode {
         telemetry.update();
 
         //turn so facing toward beacon
-        autoFunctions.twoWheelTurnPID(119, AutoFunctions.TurnDirection.RIGHT, 8);
+        autoFunctions.twoWheelTurnPID(121, AutoFunctions.TurnDirection.RIGHT, 8);
         telemetry.log().add("Turned towards beacon");
         telemetry.update();
 
@@ -87,9 +87,9 @@ public class RedAuto extends LinearOpMode {
         autoFunctions.scanForBeacon(AutoFunctions.DriveStraightDirection.FORWARD);
         hardware.setDrivePower(-0.2, -0.1);
 
-        sleep(200);
+        /*sleep(200);
         hardware.setDrivePower(-0.3, 0.3);
-        sleep(300);
+        sleep(300);*/
         hardware.stopDrive();
 
         autoFunctions.pushBeacon(BeaconState.RED);

@@ -15,18 +15,16 @@ import org.firstinspires.ftc.griffins.RobotHardware;
 @Disabled
 public class WallApproachTest extends LinearOpMode {
     public static void redWallApproach(RobotHardware hardware, AutoFunctions autoFunctions, LinearOpMode opMode, int angleDifference) {
-        autoFunctions.twoWheelTurnPID(38 - angleDifference, AutoFunctions.TurnDirection.RIGHT, 2.5);
+        autoFunctions.twoWheelTurnPID(31 - angleDifference, AutoFunctions.TurnDirection.RIGHT, 2.5);
 
         hardware.registerBeaconColorSensors();
 
         autoFunctions.driveStraightPID(25, AutoFunctions.DriveStraightDirection.BACKWARD, 1.5, true);
-
-        hardware.stopDrive();
     }
 
     public static void blueWallApproach(RobotHardware hardware, AutoFunctions autoFunctions, LinearOpMode opMode, int angleDifference) {
         int gyroHeading = hardware.getTurretGyro().getIntegratedZValue();
-        autoFunctions.twoWheelTurnPID(30 + angleDifference, AutoFunctions.TurnDirection.LEFT, 3);
+        autoFunctions.twoWheelTurnPID(25 + angleDifference, AutoFunctions.TurnDirection.LEFT, 3);
 
         hardware.registerBeaconColorSensors();
         hardware.registerLoaderColorSensor();
