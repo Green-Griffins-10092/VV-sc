@@ -36,7 +36,7 @@ public class PIDDrive {
             }
         }, null);
 
-        pidTurning = new PIDController(0.01, 0.0000075, 0.05, 1, new Func<Double>() { //i = .0025
+        pidTurning = new PIDController(0.01, 0.000015, 0.075, 1, new Func<Double>() { //i = .0025
             @Override
             public Double value() {
                 return (double) hardware.getTurretGyro().getIntegratedZValue();

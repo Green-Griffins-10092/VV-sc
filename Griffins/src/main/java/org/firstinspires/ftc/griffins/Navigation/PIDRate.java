@@ -94,7 +94,11 @@ public class PIDRate {
             lastTime = time;
             lastDist = dist;
 
-            Thread.sleep(1000);
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
 //            if (System.currentTimeMillis() != lastTime) {
 //                lastTime = System.currentTimeMillis();
 //                builder.append(lastTime).append(", ").append(error);
