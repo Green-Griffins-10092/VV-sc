@@ -32,24 +32,18 @@ public class BlueAuto extends LinearOpMode {
         telemetry.log().add("Finished Shooting");
         telemetry.update();
 
-        //drive straight a little to get off wall in order to turn
-        autoFunctions.driveStraightPID(15, AutoFunctions.DriveStraightDirection.FORWARD, 3);
-        telemetry.log().add("Off the Wall");
-        telemetry.update();
-
-        //turn so facing toward beacon
-        autoFunctions.twoWheelTurnPID(45, AutoFunctions.TurnDirection.RIGHT, 8);
-        telemetry.log().add("Turned towards beacon");
-        telemetry.update();
-
         double angle = autoFunctions.getZAngle();
 
+        hardware.getIntake().setPower(1);
+        sleep(500);
+        hardware.getIntake().setPower(0);
+
         //drive toward beacon wall
-        autoFunctions.driveStraightPID(88, AutoFunctions.DriveStraightDirection.FORWARD, 3, true);
+        autoFunctions.driveStraightPID(64, AutoFunctions.DriveStraightDirection.FORWARD, 3, true);
         telemetry.log().add("Arrived at beacon wall");
         telemetry.update();
 
-        autoFunctions.driveStraightPID(3, AutoFunctions.DriveStraightDirection.BACKWARD, 1);
+        //autoFunctions.driveStraightPID(1, AutoFunctions.DriveStraightDirection.BACKWARD, 1);
 
         angle -= autoFunctions.getZAngle();
 

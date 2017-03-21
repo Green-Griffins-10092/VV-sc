@@ -71,6 +71,8 @@ public class RobotHardware {
     public static final double BUTTON_PUSHER_RATIO = 5 / 5.0;
     public static final double BUTTON_PUSHER_LEFT_FULL_EXTENSION = 67 / 255.0;
     public static final double BUTTON_PUSHER_RIGHT_FULL_EXTENSION = 127 / 255.0;
+    public static final double BUTTON_PUSHER_RETRACTED = 20 / 255.0;
+    public static final double BUTTON_PUSHER_EXTENDED = 80 / 255.0;
     // The constants for the loader speeds
     public static final double LOADER_ZERO_POWER = 0;
     public static final double LOADER_FULL_REVERSE_POWER = -2 / 3.0;
@@ -97,6 +99,7 @@ public class RobotHardware {
     private PIDController turretController;
     private double BUTTON_PUSHER_LEFT_POSITION = (BUTTON_PUSHER_LEFT_FULL_EXTENSION - BUTTON_PUSHER_CENTER_POSITION) * BUTTON_PUSHER_RATIO + BUTTON_PUSHER_CENTER_POSITION;
     private double BUTTON_PUSHER_RIGHT_POSITION = (BUTTON_PUSHER_RIGHT_FULL_EXTENSION - BUTTON_PUSHER_CENTER_POSITION) * BUTTON_PUSHER_RATIO + BUTTON_PUSHER_CENTER_POSITION;
+    private double BUTTON_PUSHER_EXTENDED_POSITION = (BUTTON_PUSHER_EXTENDED - BUTTON_PUSHER_RETRACTED) * BUTTON_PUSHER_RATIO + BUTTON_PUSHER_RETRACTED;
     private BeaconState alliance;
     //motor variables
     private SyncedDcMotors leftDrive;
@@ -293,6 +296,15 @@ public class RobotHardware {
         setDrivePower(0, 0);
     }
 
+    public void extendButtonPusher(double percentExtension) {
+        changeButtonPusherExtension(percentExtension);
+        buttonPusherServo.setPosition(BUTTON_PUSHER_EXTENDED_POSITION);
+    }
+
+    public void retractButtonPusher() {
+        buttonPusherServo.setPosition(BUTTON_PUSHER_RETRACTED);
+    }
+
     /**
      * This method will operate the button pusher servo to push the beacon.
      *
@@ -302,6 +314,7 @@ public class RobotHardware {
      * @param alliance         stores what alliance we are, valid parameters are BLUE and RED
      * @param percentExtension is what percent of the button pusher's range will be used.
      */
+    @Deprecated
     public void pushButton(BeaconState beaconState, BeaconState alliance, double percentExtension) {
         changeButtonPusherExtension(percentExtension);
         double BUTTON_PUSHER_LEFT_POSITION = this.BUTTON_PUSHER_LEFT_POSITION;
@@ -345,10 +358,12 @@ public class RobotHardware {
      *                    If UNDEFINED is passed, it will return to the center position
      * @param alliance    stores what alliance we are, valid parameters are BLUE and RED
      */
+    @Deprecated
     public void pushButtonFullExtension(BeaconState beaconState, BeaconState alliance) {
         pushButton(beaconState, alliance, 1);
     }
 
+    @Deprecated
     public void pushButton(BeaconState beaconState, BeaconState alliance) {
         pushButton(beaconState, alliance, BUTTON_PUSHER_RATIO);
     }
@@ -382,11 +397,20 @@ public class RobotHardware {
      *
      * @return the state of the beacon, as a variable of BeaconState,
      */
+    @Deprecated
     public BeaconState findBeaconState() {
         BeaconState leftSide = findColorSensorState(leftButtonPusherColorSensor);
         BeaconState rightSide = findColorSensorState(rightButtonPusherColorSensor);
 
         return BeaconState.mergeBeaconStates(leftSide, rightSide);
+    }
+
+    public BeaconState findLeftBeaconState() {
+        return findColorSensorState(leftButtonPusherColorSensor);
+    }
+
+    public BeaconState findRightBeaconState() {
+        return findColorSensorState(rightButtonPusherColorSensor);
     }
 
     public BeaconState findParticleColor() { //unfortunately, a blue ball returns equal values for blue and green
@@ -472,6 +496,8 @@ public class RobotHardware {
 
         BUTTON_PUSHER_LEFT_POSITION = (BUTTON_PUSHER_LEFT_FULL_EXTENSION - BUTTON_PUSHER_CENTER_POSITION) * newRatio + BUTTON_PUSHER_CENTER_POSITION;
         BUTTON_PUSHER_RIGHT_POSITION = (BUTTON_PUSHER_RIGHT_FULL_EXTENSION - BUTTON_PUSHER_CENTER_POSITION) * newRatio + BUTTON_PUSHER_CENTER_POSITION;
+
+
     }
 
     public enum BeaconState {

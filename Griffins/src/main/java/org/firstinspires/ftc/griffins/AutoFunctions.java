@@ -14,7 +14,7 @@ import org.firstinspires.ftc.griffins.Navigation.PIDDrive;
  */
 
 public class AutoFunctions {
-    public static double[] scanningSpeeds = {0.05, 0.15};
+    public static double[] scanningSpeeds = {0.10, 0.10};
     private LinearOpMode linearOpMode;
     private RobotHardware hardware;
     private PIDDrive drive;
@@ -36,13 +36,8 @@ public class AutoFunctions {
 
         double drivePower = 0;
 
-        if (beaconState.containsUndefined()) {
-            if (beaconState == RobotHardware.BeaconState.UNDEFINED_UNDEFINED) {
-                drivePower = scanningSpeeds[1] * (defaultDirection == DriveStraightDirection.FORWARD ? 1 : -1);
-
-            } else {
-                drivePower = scanningSpeeds[0] * (defaultDirection == DriveStraightDirection.FORWARD ? 1 : -1);
-            }
+        if (beaconState == RobotHardware.BeaconState.UNDEFINED_UNDEFINED) {
+            drivePower = scanningSpeeds[1] * (defaultDirection == DriveStraightDirection.FORWARD ? 1 : -1);
         }
 
         return drivePower;
@@ -328,17 +323,17 @@ public class AutoFunctions {
     }
 
     public void pushBeacon(RobotHardware.BeaconState alliance) {
-        if (linearOpMode.opModeIsActive()) {
+        /*if (linearOpMode.opModeIsActive()) {
             hardware.pushButton(hardware.findBeaconState(), alliance);
             linearOpMode.sleep(1900);
             hardware.pushButton(RobotHardware.BeaconState.UNDEFINED, alliance);
             linearOpMode.sleep(700);
-        }
+        }*/
     }
 
     public void shoot() {
         if (linearOpMode.opModeIsActive()) {
-            hardware.getShooter().setPower(0.75);
+            hardware.getShooter().setPower(0.77);
             linearOpMode.sleep(500);
             hardware.setLoaderPower(1.0);
             linearOpMode.sleep(1000);
