@@ -32,11 +32,11 @@ public class PIDDrive {
         pidDrive = new PIDController(0.0015, 0, 0.003, 22.3, new Func<Double>() {
             @Override
             public Double value() {
-                return (double) (hardware.getLeftDrive().getCurrentPosition() + hardware.getRightDrive().getCurrentPosition()) / 2;
+                return (double) (hardware.getLeftDrive().getCurrentPosition() + hardware.getRightDrive().getCurrentPosition()) / 2.0;
             }
         }, null);
 
-        pidTurning = new PIDController(0.01, 0.000015, 0.075, 1, new Func<Double>() { //i = .0025
+        pidTurning = new PIDController(0.015, 0.0004, 0.16, 1, new Func<Double>() { //i = .0025
             @Override
             public Double value() {
                 return (double) hardware.getTurretGyro().getIntegratedZValue();
