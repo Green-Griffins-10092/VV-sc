@@ -71,8 +71,8 @@ public class RobotHardware {
     public static final double BUTTON_PUSHER_RATIO = 5 / 5.0;
     public static final double BUTTON_PUSHER_LEFT_FULL_EXTENSION = 67 / 255.0;
     public static final double BUTTON_PUSHER_RIGHT_FULL_EXTENSION = 127 / 255.0;
-    public static final double BUTTON_PUSHER_RETRACTED = 20 / 255.0;
-    public static final double BUTTON_PUSHER_EXTENDED = 80 / 255.0;
+    public static final double BUTTON_PUSHER_RETRACTED = 228 / 255.0;
+    public static final double BUTTON_PUSHER_EXTENDED = 123 / 255.0;
     // The constants for the loader speeds
     public static final double LOADER_ZERO_POWER = 0;
     public static final double LOADER_FULL_REVERSE_POWER = -2 / 3.0;
@@ -163,7 +163,7 @@ public class RobotHardware {
         setTurretGuidePosition(0);
 
         loaderServoOne = hardwareMap.get(Servo.class, LOADER_SERVO_ONE);
-        loaderServoOne.setDirection(Servo.Direction.REVERSE);
+        loaderServoOne.setDirection(Servo.Direction.FORWARD);
 
         /*loaderServoTwo = hardwareMap.get(CRServo.class, LOADER_SERVO_TWO);
         loaderServoTwo.setDirection(DcMotorSimple.Direction.FORWARD);
