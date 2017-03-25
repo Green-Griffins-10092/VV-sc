@@ -2,8 +2,6 @@ package org.firstinspires.ftc.griffins;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.griffins.Testing.WallApproachTest;
-
 /**
  * Created by David on 3/25/2017.
  */
@@ -29,9 +27,13 @@ public abstract class BeaconAuto extends LinearOpMode {
         if (alliance == Alliance.BLUE_ALLIANCE) {
             toWall = AutoFunctions.TurnDirection.RIGHT;
             awayFromWall = AutoFunctions.TurnDirection.LEFT;
+            color = RobotHardware.BeaconState.BLUE;
+            notColor = RobotHardware.BeaconState.RED;
         } else if (alliance == Alliance.RED_ALLIANCE) {
             toWall = AutoFunctions.TurnDirection.LEFT;
             awayFromWall = AutoFunctions.TurnDirection.RIGHT;
+            color = RobotHardware.BeaconState.RED;
+            notColor = RobotHardware.BeaconState.BLUE;
         }
 
         waitForStart();
@@ -59,22 +61,23 @@ public abstract class BeaconAuto extends LinearOpMode {
         angle -= autoFunctions.getZAngle();
 
         //"parallel parking"
-        if (alliance == Alliance.BLUE_ALLIANCE) {
-            WallApproachTest.blueWallApproach(hardware, autoFunctions, this, (int) angle);
-            color = RobotHardware.BeaconState.BLUE;
-            notColor = RobotHardware.BeaconState.RED;
-        }
-        if (alliance == Alliance.RED_ALLIANCE) {
-            WallApproachTest.redWallApproach(hardware, autoFunctions, this, (int) angle);
-            color = RobotHardware.BeaconState.RED;
-            notColor = RobotHardware.BeaconState.BLUE;
-        }
+        int gyroHeading = hardware.getTurretGyro().getIntegratedZValue();
+        autoFunctions.twoWheelTurnPID(22 + (alliance == Alliance.RED_ALLIANCE ? -1 : 1) * angle, awayFromWall, 2);
+
+        hardware.registerBeaconColorSensors();
+        hardware.registerLoaderColorSensor();
+
+        autoFunctions.driveStraightPID(28, AutoFunctions.DriveStraightDirection.FORWARD, 1.5, true);
+
+        //autoFunctions.twoWheelTurnPID(20, AutoFunctions.TurnDirection.RIGHT, .3, true); //timer out
+
+        hardware.stopDrive();
 
         if (hardware.findParticleColor() == notColor) {
             hardware.setLoaderPower(-1);
         }
 
-        autoFunctions.scanForBeacon(AutoFunctions.DriveStraightDirection.FORWARD);
+        autoFunctions.scanForBeacon(AutoFunctions.DriveStraightDirection.FORWARD, toWall);
 
         hardware.setLoaderPower(0);
 
@@ -92,7 +95,7 @@ public abstract class BeaconAuto extends LinearOpMode {
         //autoFunctions.twoWheelTurnPID(45, AutoFunctions.TurnDirection.LEFT, 0.5, true); //timer out
         autoFunctions.wallPIDDrive(40, AutoFunctions.DriveStraightDirection.BACKWARD, toWall, 2);
 
-        autoFunctions.scanForBeacon(AutoFunctions.DriveStraightDirection.BACKWARD);
+        autoFunctions.scanForBeacon(AutoFunctions.DriveStraightDirection.BACKWARD, toWall);
 
         setDrivePower(-0.2, -0.1);
 
@@ -111,6 +114,8 @@ public abstract class BeaconAuto extends LinearOpMode {
 
     }
 
+    // this methods mirrors driving commands, to use, enter powers for the blue auto,
+    // and the method will mirror the driving power when the alliance is red.
     public void setDrivePower(double power1, double power2) {
         if (alliance == Alliance.BLUE_ALLIANCE)
             hardware.setDrivePower(power1, power2);

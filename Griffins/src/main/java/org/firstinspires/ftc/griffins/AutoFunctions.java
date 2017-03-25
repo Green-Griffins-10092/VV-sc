@@ -28,10 +28,13 @@ public class AutoFunctions {
         rate = new PIDRate(hardware);
     }
 
-    public void wallDrive(double signedPower) {
-        double powerRatio = 0.2 / 0.25;
+    public void wallDrive(double signedPower, TurnDirection turnDirection) {
+        double powerRatio = 0.8;
 
-        hardware.setDrivePower(signedPower, signedPower * powerRatio);
+        if (turnDirection == TurnDirection.RIGHT)
+            hardware.setDrivePower(signedPower, signedPower * powerRatio);
+        else if (turnDirection == TurnDirection.LEFT)
+            hardware.setDrivePower(signedPower * powerRatio, signedPower);
     }
 
     private double determineDrivePower(DriveStraightDirection defaultDirection) {
@@ -46,13 +49,13 @@ public class AutoFunctions {
         return drivePower;
     }
 
-    public void scanForBeacon(DriveStraightDirection defaultDirection) {
+    public void scanForBeacon(DriveStraightDirection defaultDirection, TurnDirection turnDirection) {
         double drivePower = determineDrivePower(defaultDirection);
         double lastDrivePower = drivePower;
 
         while (linearOpMode.opModeIsActive() && drivePower != 0) {
             lastDrivePower = drivePower;
-            wallDrive(drivePower);
+            wallDrive(drivePower, turnDirection);
             drivePower = determineDrivePower(defaultDirection);
         }
 
@@ -428,11 +431,11 @@ public class AutoFunctions {
 
     public void wallPIDDrive(double inches, DriveStraightDirection direction, TurnDirection turnDirection, double timeoutSeconds) {
         drive.setDriveTarget(inches * (direction == DriveStraightDirection.FORWARD ? 1 : -1));
-        double leftBias, rightBias;
+        double leftBias = 0, rightBias = 0;
         if (turnDirection == TurnDirection.RIGHT) {
             leftBias = 1;
             rightBias = .9;
-        } else {
+        } else if (turnDirection == TurnDirection.LEFT) {
             leftBias = .9;
             rightBias = 1;
         }

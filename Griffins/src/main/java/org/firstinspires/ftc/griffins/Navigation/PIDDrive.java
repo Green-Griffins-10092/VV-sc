@@ -82,7 +82,7 @@ public class PIDDrive {
             double power;
             power = pidDrive.sendPIDOutput();
             power = Range.clip(power, -0.6, 0.6);
-            difference = Range.clip(pidDrivingDifference.sendPIDOutput(), 0, 0.5);
+            //difference = Range.clip(pidDrivingDifference.sendPIDOutput(), 0, 0.5);
 
             hardware.setDrivePower(power * leftBias, power * rightBias);
         }
