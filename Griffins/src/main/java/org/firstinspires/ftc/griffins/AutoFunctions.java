@@ -367,6 +367,27 @@ public class AutoFunctions {
         }
     }
 
+    public void autoLoad(RobotHardware.BeaconState alliance) {
+        double loaderPower;
+        double intakePower = 1.0;
+
+        RobotHardware.BeaconState ball = hardware.findParticleColor();
+
+        if (ball == alliance) {
+            loaderPower = 1;
+            intakePower = 1;
+        } else if (ball != alliance) {
+            loaderPower = 0.0;
+        } else {
+            loaderPower = -1;
+            intakePower = -1;
+        }
+
+        hardware.getIntake().setPower(intakePower);
+        hardware.setLoaderPower(loaderPower);
+
+    }
+
     public float getZAngle(){
         //return hardware.getRobotTracker().getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX).firstAngle;
         return hardware.getTurretGyro().getIntegratedZValue();

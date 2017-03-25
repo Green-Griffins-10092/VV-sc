@@ -34,20 +34,20 @@ public class RedAuto extends LinearOpMode implements FtcMenu.MenuButtonsAndDashb
 
         while (opModeIsActive() && hardware.getTurretGyro().isCalibrating()) ;
 
-        //shoot two particles
+        //shoot two particles w turret facing vortex (set by drivers) and robot facing wall
         autoFunctions.shoot();
         telemetry.log().add("Finished Shooting");
         telemetry.update();
 
-        //drive straight a little to get off wall in order to turn
+      /*  //drive straight a little to get off wall in order to turn
         autoFunctions.driveStraightPID(20, AutoFunctions.DriveStraightDirection.FORWARD, 3);
         telemetry.log().add("Off the Wall");
-        telemetry.update();
+        telemetry.update();*/
 
-        //turn so facing toward beacon
+       /* //turn so facing toward beacon
         autoFunctions.twoWheelTurnPID(119, AutoFunctions.TurnDirection.RIGHT, 8);
         telemetry.log().add("Turned towards beacon");
-        telemetry.update();
+        telemetry.update();*/
 
         double angle = autoFunctions.getZAngle();
 
@@ -70,6 +70,7 @@ public class RedAuto extends LinearOpMode implements FtcMenu.MenuButtonsAndDashb
         hardware.pushButtonFullExtension(BeaconState.UNDEFINED, BeaconState.RED);
         sleep(1000);*/
 
+        autoFunctions.autoLoad(BeaconState.RED);
 
         autoFunctions.scanForBeacon(AutoFunctions.DriveStraightDirection.BACKWARD);
 
