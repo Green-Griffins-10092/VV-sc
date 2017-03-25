@@ -32,11 +32,11 @@ public class PIDDrive {
         pidDrive = new PIDController(0.0015, 0, 0.003, 22.3, new Func<Double>() {
             @Override
             public Double value() {
-                return (double) (hardware.getLeftDrive().getCurrentPosition() + hardware.getRightDrive().getCurrentPosition()) / 2;
+                return (double) (hardware.getLeftDrive().getCurrentPosition() + hardware.getRightDrive().getCurrentPosition()) / 2.0;
             }
         }, null);
 
-        pidTurning = new PIDController(0.01, 0.00000375, 0.05, 1, new Func<Double>() { //i = .0025
+        pidTurning = new PIDController(0.015, 0.0004, 0.16, 1, new Func<Double>() { //i = .0025
             @Override
             public Double value() {
                 return (double) hardware.getTurretGyro().getIntegratedZValue();
@@ -61,6 +61,7 @@ public class PIDDrive {
     public void syncDrives(){
         double power;
 
+
         if (isTurning) {
             power = pidTurning.sendPIDOutput();
             power = Range.clip(power, -0.4, 0.4);
@@ -80,7 +81,7 @@ public class PIDDrive {
         if (!isTurning) {
             double power;
             power = pidDrive.sendPIDOutput();
-            power = Range.clip(power, -0.5, 0.5);
+            power = Range.clip(power, -0.6, 0.6);
             difference = Range.clip(pidDrivingDifference.sendPIDOutput(), 0, 0.5);
 
             hardware.setDrivePower(power, power * 0.90);

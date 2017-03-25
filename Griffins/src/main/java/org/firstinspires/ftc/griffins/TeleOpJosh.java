@@ -101,7 +101,8 @@ public class TeleOpJosh extends OpMode {
         }
 
         hardware.setDrivePower(leftDrivePower, rightDrivePower);
-        hardware.getShooter().setPower(shooterPower);
+        hardware.getShooterLeft().setPower(shooterPower);
+        hardware.getShooterRight().setPower(shooterPower);
         hardware.getIntake().setPower(intakeSpeed);
         hardware.setLoaderPower(loaderPower);
         hardware.pushButtonFullExtension(beaconPushState, BeaconState.BLUE);

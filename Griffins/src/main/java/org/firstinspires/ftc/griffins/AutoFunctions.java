@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.griffins.Navigation.LinearOpModeTimeOutFunc;
 import org.firstinspires.ftc.griffins.Navigation.PIDDrive;
+import org.firstinspires.ftc.griffins.Navigation.PIDRate;
 
 /**
  * Created by David on 11/28/2016.
@@ -18,11 +19,13 @@ public class AutoFunctions {
     private LinearOpMode linearOpMode;
     private RobotHardware hardware;
     private PIDDrive drive;
+    private PIDRate rate;
 
     public AutoFunctions(RobotHardware hardware, LinearOpMode linearOpMode) {
         this.hardware = hardware;
         this.linearOpMode = linearOpMode;
         drive = new PIDDrive(hardware);
+        rate = new PIDRate(hardware);
     }
 
     public void wallDrive(double signedPower) {
@@ -331,9 +334,9 @@ public class AutoFunctions {
         }*/
     }
 
-    public void shoot() {
-        if (linearOpMode.opModeIsActive()) {
-            hardware.getShooter().setPower(0.77);
+    public void shoot(){
+        if (linearOpMode.opModeIsActive()){
+            hardware.getShooter().setPower(.77);
             linearOpMode.sleep(500);
             hardware.setLoaderPower(1.0);
             linearOpMode.sleep(1000);
@@ -344,6 +347,40 @@ public class AutoFunctions {
             hardware.getShooter().setPower(0.0);
             hardware.setLoaderPower(0.0);
         }
+    }
+
+    public void shootPID() {
+        if (linearOpMode.opModeIsActive()) {
+            rate.setRateTarget(7);
+            linearOpMode.sleep(500);
+            hardware.setLoaderPower(1.0);
+            linearOpMode.sleep(2000);
+            hardware.setLoaderPower(0.0);
+            linearOpMode.sleep(500);
+            rate.setRateTarget(0);
+            hardware.setLoaderPower(0.0);
+        }
+    }
+
+    public void autoLoad(RobotHardware.BeaconState alliance) {
+        double loaderPower;
+        double intakePower = 1.0;
+
+        RobotHardware.BeaconState ball = hardware.findParticleColor();
+
+        if (ball == alliance) {
+            loaderPower = 1;
+            intakePower = 1;
+        } else if (ball != alliance) {
+            loaderPower = 0.0;
+        } else {
+            loaderPower = -1;
+            intakePower = -1;
+        }
+
+        hardware.getIntake().setPower(intakePower);
+        hardware.setLoaderPower(loaderPower);
+
     }
 
     public float getZAngle(){
@@ -383,6 +420,10 @@ public class AutoFunctions {
 
     public String twoWheelTurnPID(double degrees, TurnDirection direction, double timeoutSeconds) {
         return twoWheelTurnPID(degrees, direction, timeoutSeconds, false);
+    }
+
+    public String shootPIDtoString(double rps) {
+        return rate.spinToTarget(new LinearOpModeTimeOutFunc(linearOpMode, 10), linearOpMode.telemetry, false);
     }
 
     public void wallPIDDrive(double inches, DriveStraightDirection direction, double timeoutSeconds) {

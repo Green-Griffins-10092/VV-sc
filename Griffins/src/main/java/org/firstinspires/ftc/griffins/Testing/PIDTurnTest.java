@@ -12,7 +12,6 @@ import org.firstinspires.ftc.griffins.RobotHardware;
  * Created by David on 12/20/2016.
  */
 @Autonomous(group = "test")
-@Disabled
 public class PIDTurnTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
