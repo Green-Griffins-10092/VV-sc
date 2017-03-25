@@ -426,9 +426,17 @@ public class AutoFunctions {
         return rate.spinToTarget(new LinearOpModeTimeOutFunc(linearOpMode, 10), linearOpMode.telemetry, false);
     }
 
-    public void wallPIDDrive(double inches, DriveStraightDirection direction, double timeoutSeconds) {
+    public void wallPIDDrive(double inches, DriveStraightDirection direction, TurnDirection turnDirection, double timeoutSeconds) {
         drive.setDriveTarget(inches * (direction == DriveStraightDirection.FORWARD ? 1 : -1));
-        drive.wallDriveToTarget(new LinearOpModeTimeOutFunc(linearOpMode, timeoutSeconds));
+        double leftBias, rightBias;
+        if (turnDirection == TurnDirection.RIGHT) {
+            leftBias = 1;
+            rightBias = .9;
+        } else {
+            leftBias = .9;
+            rightBias = 1;
+        }
+        drive.wallDriveToTarget(leftBias, rightBias, new LinearOpModeTimeOutFunc(linearOpMode, timeoutSeconds));
     }
 
     public enum DriveStraightDirection {FORWARD, BACKWARD}

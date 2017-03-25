@@ -84,7 +84,7 @@ public class RedAuto extends LinearOpMode {
         }
 
         //autoFunctions.twoWheelTurnPID(90, AutoFunctions.TurnDirection.RIGHT, 0.3); //timer out
-        autoFunctions.wallPIDDrive(43, AutoFunctions.DriveStraightDirection.FORWARD, 2);
+        autoFunctions.wallPIDDrive(43, AutoFunctions.DriveStraightDirection.FORWARD, AutoFunctions.TurnDirection.RIGHT, 2);
 
         autoFunctions.scanForBeacon(AutoFunctions.DriveStraightDirection.FORWARD);
         hardware.setDrivePower(-0.2, -0.1);

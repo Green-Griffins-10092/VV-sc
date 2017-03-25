@@ -77,14 +77,14 @@ public class PIDDrive {
         }
     }
 
-    public void biasedSyncDrives() {
+    public void biasedSyncDrives(double leftBias, double rightBias) {
         if (!isTurning) {
             double power;
             power = pidDrive.sendPIDOutput();
             power = Range.clip(power, -0.6, 0.6);
             difference = Range.clip(pidDrivingDifference.sendPIDOutput(), 0, 0.5);
 
-            hardware.setDrivePower(power, power * 0.90);
+            hardware.setDrivePower(power * leftBias, power * rightBias);
         }
     }
 
@@ -101,10 +101,10 @@ public class PIDDrive {
         isTurning = true;
     }
 
-    public void wallDriveToTarget(Func<Boolean> earlyExitCheck) {
+    public void wallDriveToTarget(double leftBias, double rightBias, Func<Boolean> earlyExitCheck) {
         if (!isTurning) {
             do {
-                biasedSyncDrives();
+                biasedSyncDrives(leftBias, rightBias);
             } while (earlyExitCheck.value() && !pidDrive.isOnTarget());
         }
 

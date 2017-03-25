@@ -86,7 +86,7 @@ public class BlueAuto extends LinearOpMode {
         }
 
         //autoFunctions.twoWheelTurnPID(45, AutoFunctions.TurnDirection.LEFT, 0.5, true); //timer out
-        autoFunctions.wallPIDDrive(40, AutoFunctions.DriveStraightDirection.BACKWARD, 2);
+        autoFunctions.wallPIDDrive(40, AutoFunctions.DriveStraightDirection.BACKWARD, AutoFunctions.TurnDirection.RIGHT, 2);
 
         autoFunctions.scanForBeacon(AutoFunctions.DriveStraightDirection.BACKWARD);
 
