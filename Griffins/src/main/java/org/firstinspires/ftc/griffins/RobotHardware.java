@@ -54,6 +54,8 @@ public class RobotHardware {
     public static final String TURRET_GYRO = "gyro";
     public static final String LEFT_BUTTON_PUSHER_SENSOR = "colorL";
     public static final String RIGHT_BUTTON_PUSHER_SENSOR = "colorR";
+    public static final String LEFT_SECONDARY_BUTTON_PUSHER_SENSOR = "colorL2";
+    public static final String RIGHT_SECONDARY_BUTTON_PUSHER_SENSOR = "colorR2";
     public static final String LOADER_COLOR_SENSOR = "intake color";
     public static final String BEACON_DISTANCE_SENSOR = "distance";
     public static final String LOADER_SWITCH = "loader switch";
@@ -68,7 +70,7 @@ public class RobotHardware {
     public static final I2cAddr LOADER_COLOR_SENSOR_ADDRESS = I2cAddr.create8bit(0x32);
     // The constants for the button pusher positions
     public static final double BUTTON_PUSHER_CENTER_POSITION = 97 / 255.0;
-    public static final double BUTTON_PUSHER_RATIO = 5 / 5.0;
+    public static final double BUTTON_PUSHER_RATIO = 1 / 2.0;
     public static final double BUTTON_PUSHER_LEFT_FULL_EXTENSION = 67 / 255.0;
     public static final double BUTTON_PUSHER_RIGHT_FULL_EXTENSION = 127 / 255.0;
     public static final double BUTTON_PUSHER_RETRACTED = 228 / 255.0;
@@ -163,7 +165,7 @@ public class RobotHardware {
 
         buttonPusherServo = hardwareMap.get(Servo.class, BUTTON_PUSHER_SERVO);
         buttonPusherServo.setDirection(Servo.Direction.FORWARD);
-        this.pushButton(UNDEFINED);
+        this.retractButtonPusher();
 
         leftTurretGuide = hardwareMap.get(Servo.class, LEFT_TURRET_GUIDE_SERVO);
         leftTurretGuide.setDirection(Servo.Direction.FORWARD);
@@ -315,6 +317,10 @@ public class RobotHardware {
         setDrivePower(0, 0);
     }
 
+    public void extendButtonPusher() {
+        extendButtonPusher(BUTTON_PUSHER_RATIO);
+    }
+
     public void extendButtonPusher(double percentExtension) {
         changeButtonPusherExtension(percentExtension);
         buttonPusherServo.setPosition(BUTTON_PUSHER_EXTENDED_POSITION);
@@ -334,7 +340,7 @@ public class RobotHardware {
      * @param percentExtension is what percent of the button pusher's range will be used.
      */
     @Deprecated
-    public void pushButton(BeaconState beaconState, BeaconState alliance, double percentExtension) {
+    private void pushButton(BeaconState beaconState, BeaconState alliance, double percentExtension) {
         changeButtonPusherExtension(percentExtension);
         double BUTTON_PUSHER_LEFT_POSITION = this.BUTTON_PUSHER_LEFT_POSITION;
         double BUTTON_PUSHER_CENTER_POSITION = RobotHardware.BUTTON_PUSHER_CENTER_POSITION;
@@ -516,7 +522,7 @@ public class RobotHardware {
         BUTTON_PUSHER_LEFT_POSITION = (BUTTON_PUSHER_LEFT_FULL_EXTENSION - BUTTON_PUSHER_CENTER_POSITION) * newRatio + BUTTON_PUSHER_CENTER_POSITION;
         BUTTON_PUSHER_RIGHT_POSITION = (BUTTON_PUSHER_RIGHT_FULL_EXTENSION - BUTTON_PUSHER_CENTER_POSITION) * newRatio + BUTTON_PUSHER_CENTER_POSITION;
 
-
+        BUTTON_PUSHER_EXTENDED_POSITION = (BUTTON_PUSHER_EXTENDED - BUTTON_PUSHER_RETRACTED) * newRatio + BUTTON_PUSHER_RETRACTED;
     }
 
     public enum BeaconState {

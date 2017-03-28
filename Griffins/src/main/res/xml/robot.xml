@@ -62,6 +62,22 @@
             name="intake color"
             port="3"/>
     </DeviceInterfaceModule>
+    <DeviceInterfaceModule
+        name="Device Interface Module Beacon"
+        serialNumber="AI02RM65">
+        <ColorSensor
+            name="colorL"
+            port="0"/>
+        <ColorSensor
+            name="colorR"
+            port="1"/>
+        <ColorSensor
+            name="colorL2"
+            port="2"/>
+        <ColorSensor
+            name="colorR2"
+            port="3"/>
+    </DeviceInterfaceModule>
     <MotorController
         name="Motor Controller R"
         serialNumber="A7008NIY">

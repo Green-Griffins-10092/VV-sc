@@ -5,9 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.griffins.RobotHardware.BeaconState;
 
 import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.BLUE;
-import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.BLUE_RED;
 import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.RED;
-import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.RED_BLUE;
 import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.UNDEFINED;
 
 /**
@@ -86,7 +84,7 @@ public abstract class TeleOp extends OpMode {
                 if (gamepad2.left_bumper) {
                     loaderPower = -1.0;
                 } else if (gamepad2.left_trigger != 0) {
-                    loaderPower = 1;
+                    loaderPower = .75;
                 } else {
                     loaderPower = 0;
                 }
@@ -118,17 +116,13 @@ public abstract class TeleOp extends OpMode {
             turretState = false; //!gamepad2.left_stick_button && shooterPower == 0;
 
             if (gamepad2.x || gamepad2.b || gamepad2.right_stick_button) {
-                beaconPushState = hardware.findBeaconState();
                 beaconPushRatio = 1;
             } else if (gamepad2.right_stick_x < -0.1) {
-                beaconPushState = alliance == RED ? RED_BLUE : BLUE_RED;
                 beaconPushRatio = -gamepad2.right_stick_x;
             } else if (gamepad2.right_stick_x > 0.1) {
-                beaconPushState = alliance == RED ? BLUE_RED : RED_BLUE;
                 beaconPushRatio = gamepad2.right_stick_x;
             } else {
-                beaconPushState = BeaconState.UNDEFINED;
-                beaconPushRatio = RobotHardware.BUTTON_PUSHER_RATIO;
+                beaconPushRatio = 0;
             }
         } //end gamepad 2 controls
 
@@ -138,7 +132,7 @@ public abstract class TeleOp extends OpMode {
             hardware.getShooter().setPower(shooterPower);
             hardware.getIntake().setPower(intakeSpeed);
             hardware.setLoaderPower(loaderPower);
-            hardware.pushButton(beaconPushState, alliance, beaconPushRatio);
+            hardware.extendButtonPusher(beaconPushRatio);
             hardware.setTurretRotation(targetTurretSpeed, turretState);
         } //end send hardware commands
 
@@ -168,6 +162,6 @@ public abstract class TeleOp extends OpMode {
 
     @Override
     public void stop() {
-        hardware.pushButton(BeaconState.UNDEFINED);
+        hardware.retractButtonPusher();
     }
 }
