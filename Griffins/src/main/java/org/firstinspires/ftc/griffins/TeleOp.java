@@ -21,7 +21,7 @@ public abstract class TeleOp extends OpMode {
         hardware = new RobotHardware();
         hardware.initialize(hardwareMap);
 
-        hardware.registerBeaconColorSensors();
+//        hardware.registerBeaconColorSensors();
         hardware.registerLoaderColorSensor();
 
         gamepad1.setJoystickDeadzone(0.1f);
@@ -148,12 +148,12 @@ public abstract class TeleOp extends OpMode {
             telemetry.addData("Shooter Speed", shooterPower);
             telemetry.addData("gamepad 1", gamepad1);
             telemetry.addData("gamepad 2", gamepad2);
-            telemetry.addData("left sensor data(a b r g)", hardware.getLeftButtonPusherColorSensor().alpha() + " " +
+/*            telemetry.addData("left sensor data(a b r g)", hardware.getLeftButtonPusherColorSensor().alpha() + " " +
                     hardware.getLeftButtonPusherColorSensor().blue() + " " + hardware.getLeftButtonPusherColorSensor().red() +
                     " " + hardware.getLeftButtonPusherColorSensor().green());
             telemetry.addData("Right sensor data(a b r g)", hardware.getRightButtonPusherColorSensor().alpha() + " " +
                     hardware.getRightButtonPusherColorSensor().blue() + " " + hardware.getRightButtonPusherColorSensor().red() +
-                    " " + hardware.getRightButtonPusherColorSensor().green());
+                    " " + hardware.getRightButtonPusherColorSensor().green());*/
             telemetry.addData("Loader sensor data(a b r g)", hardware.getLoaderColorSensor().alpha() + " " +
                     hardware.getLoaderColorSensor().blue() + " " + hardware.getLoaderColorSensor().red() +
                     " " + hardware.getLoaderColorSensor().green());

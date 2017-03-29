@@ -53,13 +53,23 @@
             name="gyro"
             port="0"/>
         <ColorSensor
-            name="colorL"
+            name="intake color"
             port="1"/>
+    </DeviceInterfaceModule>
+    <DeviceInterfaceModule
+        name="Beacon DIM"
+        serialNumber="AI02RM65">
+        <ColorSensor
+            name="colorL"
+            port="0"/>
         <ColorSensor
             name="colorR"
+            port="1"/>
+        <ColorSensor
+            name="colorL2"
             port="2"/>
         <ColorSensor
-            name="intake color"
+            name="colorR2"
             port="3"/>
     </DeviceInterfaceModule>
     <DeviceInterfaceModule

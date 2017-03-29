@@ -64,9 +64,11 @@ public class RobotHardware {
     // The constants for motor encoders
     public static final int NEVEREST_ENCODER_COUNT_PER_ROTATION = 28;
     public static final int NEVEREST_40_ENCODER_COUNTS_PER_ROTATION = NEVEREST_ENCODER_COUNT_PER_ROTATION * 40;
-    // The addresses for the color sensors, since we are using three, the default will be changed
+    // The addresses for the color sensors, since we are using five, the default will be changed
     public static final I2cAddr LEFT_COLOR_SENSOR_ADDRESS = I2cAddr.create8bit(0x38);
     public static final I2cAddr RIGHT_COLOR_SENSOR_ADDRESS = I2cAddr.create8bit(0x3C);
+    public static final I2cAddr LEFT_SECONDARY_COLOR_SENSOR_ADDRESS = I2cAddr.create8bit(0x3A);
+    public static final I2cAddr RIGHT_SECONDARY_COLOR_SENSOR_ADDRESS = I2cAddr.create8bit(0x3E);
     public static final I2cAddr LOADER_COLOR_SENSOR_ADDRESS = I2cAddr.create8bit(0x32);
     // The constants for the button pusher positions
     public static final double BUTTON_PUSHER_CENTER_POSITION = 97 / 255.0;
@@ -123,6 +125,8 @@ public class RobotHardware {
     private ModernRoboticsI2cGyro turretGyro;
     private ModernRoboticsI2cColorSensor leftButtonPusherColorSensor;
     private ModernRoboticsI2cColorSensor rightButtonPusherColorSensor;
+    private ModernRoboticsI2cColorSensor leftSecondaryButtonPusherColorSensor;
+    private ModernRoboticsI2cColorSensor rightSecondaryButtonPusherColorSensor;
     private ModernRoboticsI2cColorSensor loaderColorSensor;
     private ModernRoboticsAnalogOpticalDistanceSensor beaconDistanceSensor;
     private DigitalChannel loaderParticleLimitSwitch;
@@ -197,6 +201,16 @@ public class RobotHardware {
         rightButtonPusherColorSensor.setI2cAddress(RIGHT_COLOR_SENSOR_ADDRESS);
         rightButtonPusherColorSensor.enableLed(true);
         rightButtonPusherColorSensor.enableLed(false);
+
+        leftSecondaryButtonPusherColorSensor = hardwareMap.get(ModernRoboticsI2cColorSensor.class, LEFT_SECONDARY_BUTTON_PUSHER_SENSOR);
+        leftSecondaryButtonPusherColorSensor.setI2cAddress(LEFT_SECONDARY_COLOR_SENSOR_ADDRESS);
+        leftSecondaryButtonPusherColorSensor.enableLed(true);
+        leftSecondaryButtonPusherColorSensor.enableLed(false);
+
+        rightSecondaryButtonPusherColorSensor = hardwareMap.get(ModernRoboticsI2cColorSensor.class, RIGHT_SECONDARY_BUTTON_PUSHER_SENSOR);
+        rightSecondaryButtonPusherColorSensor.setI2cAddress(RIGHT_SECONDARY_COLOR_SENSOR_ADDRESS);
+        rightSecondaryButtonPusherColorSensor.enableLed(true);
+        rightSecondaryButtonPusherColorSensor.enableLed(false);
 
         deregisterBeaconColorSensors(); // TODO: 2/12/2017 need to register the color sensors in relevant files!
 
@@ -384,28 +398,38 @@ public class RobotHardware {
      * @param alliance    stores what alliance we are, valid parameters are BLUE and RED
      */
     @Deprecated
-    public void pushButtonFullExtension(BeaconState beaconState, BeaconState alliance) {
+    private void pushButtonFullExtension(BeaconState beaconState, BeaconState alliance) {
         pushButton(beaconState, alliance, 1);
     }
 
     @Deprecated
-    public void pushButton(BeaconState beaconState, BeaconState alliance) {
+    private void pushButton(BeaconState beaconState, BeaconState alliance) {
         pushButton(beaconState, alliance, BUTTON_PUSHER_RATIO);
     }
 
     @Deprecated
-    public void pushButton(BeaconState beaconState) {
+    private void pushButton(BeaconState beaconState) {
         pushButton(beaconState, BLUE);
     }
 
     public void deregisterBeaconColorSensors() {
         leftButtonPusherColorSensor.getI2cController().deregisterForPortReadyCallback(leftButtonPusherColorSensor.getPort());
         rightButtonPusherColorSensor.getI2cController().deregisterForPortReadyCallback(rightButtonPusherColorSensor.getPort());
+        leftSecondaryButtonPusherColorSensor.getI2cController()
+                .deregisterForPortReadyCallback(leftSecondaryButtonPusherColorSensor.getPort());
+        rightSecondaryButtonPusherColorSensor.getI2cController()
+                .deregisterForPortReadyCallback(rightSecondaryButtonPusherColorSensor.getPort());
     }
 
     public void registerBeaconColorSensors() {
-        leftButtonPusherColorSensor.getI2cController().registerForI2cPortReadyCallback(leftButtonPusherColorSensor, leftButtonPusherColorSensor.getPort());
-        rightButtonPusherColorSensor.getI2cController().registerForI2cPortReadyCallback(rightButtonPusherColorSensor, rightButtonPusherColorSensor.getPort());
+        leftButtonPusherColorSensor.getI2cController()
+                .registerForI2cPortReadyCallback(leftButtonPusherColorSensor, leftButtonPusherColorSensor.getPort());
+        rightButtonPusherColorSensor.getI2cController()
+                .registerForI2cPortReadyCallback(rightButtonPusherColorSensor, rightButtonPusherColorSensor.getPort());
+        leftSecondaryButtonPusherColorSensor.getI2cController()
+                .registerForI2cPortReadyCallback(leftSecondaryButtonPusherColorSensor, leftSecondaryButtonPusherColorSensor.getPort());
+        rightSecondaryButtonPusherColorSensor.getI2cController()
+                .registerForI2cPortReadyCallback(rightSecondaryButtonPusherColorSensor, rightSecondaryButtonPusherColorSensor.getPort());
     }
 
     public void deregisterLoaderColorSensor() {
@@ -431,11 +455,17 @@ public class RobotHardware {
     }
 
     public BeaconState findLeftBeaconState() {
-        return findColorSensorState(leftButtonPusherColorSensor);
+        BeaconState leftSide = findColorSensorState(leftButtonPusherColorSensor);
+        BeaconState rightSide = findColorSensorState(leftSecondaryButtonPusherColorSensor);
+
+        return BeaconState.mergeBeaconStates(leftSide, rightSide);
     }
 
     public BeaconState findRightBeaconState() {
-        return findColorSensorState(rightButtonPusherColorSensor);
+        BeaconState rightSide = findColorSensorState(rightButtonPusherColorSensor);
+        BeaconState leftSide = findColorSensorState(rightSecondaryButtonPusherColorSensor);
+
+        return BeaconState.mergeBeaconStates(leftSide, rightSide);
     }
 
     public BeaconState findParticleColor() { //unfortunately, a blue ball returns equal values for blue and green

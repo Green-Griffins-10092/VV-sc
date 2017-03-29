@@ -15,7 +15,7 @@ import org.firstinspires.ftc.griffins.Navigation.PIDRate;
  */
 
 public class AutoFunctions {
-    public static double[] scanningSpeeds = {0.10, 0.10};
+    public static double[] scanningSpeeds = {0.05, 0.15};
     private LinearOpMode linearOpMode;
     private RobotHardware hardware;
     private PIDDrive drive;
@@ -42,8 +42,13 @@ public class AutoFunctions {
 
         double drivePower = 0;
 
-        if (beaconState == RobotHardware.BeaconState.UNDEFINED_UNDEFINED) {
-            drivePower = scanningSpeeds[1] * (defaultDirection == DriveStraightDirection.FORWARD ? 1 : -1);
+        if (beaconState.containsUndefined()) {
+            if (beaconState == RobotHardware.BeaconState.UNDEFINED_UNDEFINED) {
+                drivePower = scanningSpeeds[1] * (defaultDirection == DriveStraightDirection.FORWARD ? 1 : -1);
+
+            } else {
+                drivePower = scanningSpeeds[0] * (defaultDirection == DriveStraightDirection.FORWARD ? 1 : -1);
+            }
         }
 
         return drivePower;
