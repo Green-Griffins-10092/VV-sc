@@ -105,7 +105,6 @@ public class TeleOpJosh extends OpMode {
         hardware.getShooterRight().setPower(shooterPower);
         hardware.getIntake().setPower(intakeSpeed);
         hardware.setLoaderPower(loaderPower);
-        hardware.pushButtonFullExtension(beaconPushState, BeaconState.BLUE);
         hardware.setTurretRotation(targetTurretSpeed, turretTrackingOn);
 
         telemetry.addData("Gyro Heading", hardware.getTurretGyro().getIntegratedZValue());

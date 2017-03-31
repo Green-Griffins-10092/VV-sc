@@ -455,17 +455,17 @@ public class RobotHardware {
     }
 
     public BeaconState findLeftBeaconState() {
-        BeaconState leftSide = findColorSensorState(leftButtonPusherColorSensor);
-        BeaconState rightSide = findColorSensorState(leftSecondaryButtonPusherColorSensor);
+        BeaconState backSide = findColorSensorState(leftButtonPusherColorSensor);
+        BeaconState frontSide = findColorSensorState(leftSecondaryButtonPusherColorSensor);
 
-        return BeaconState.mergeBeaconStates(leftSide, rightSide);
+        return BeaconState.mergeBeaconStates(backSide, frontSide);
     }
 
     public BeaconState findRightBeaconState() {
-        BeaconState rightSide = findColorSensorState(rightButtonPusherColorSensor);
-        BeaconState leftSide = findColorSensorState(rightSecondaryButtonPusherColorSensor);
+        BeaconState backSide = findColorSensorState(rightButtonPusherColorSensor);
+        BeaconState frontSide = findColorSensorState(rightSecondaryButtonPusherColorSensor);
 
-        return BeaconState.mergeBeaconStates(leftSide, rightSide);
+        return BeaconState.mergeBeaconStates(backSide, frontSide);
     }
 
     public BeaconState findParticleColor() { //unfortunately, a blue ball returns equal values for blue and green
@@ -575,12 +575,12 @@ public class RobotHardware {
             this.numberState = numberState;
         }
 
-        public static BeaconState mergeBeaconStates(BeaconState left, BeaconState right) {
-            if (left.numberState >> 2 != 0 || right.numberState >> 2 != 0) {
+        public static BeaconState mergeBeaconStates(BeaconState back, BeaconState front) {
+            if (back.numberState >> 2 != 0 || front.numberState >> 2 != 0) {
                 throw new IllegalArgumentException("Valid arguments are BLUE, RED, UNDEFINED, all others are already merged");
             }
 
-            return getFromNumberState((left.numberState << 2) + right.numberState);
+            return getFromNumberState((back.numberState << 2) + front.numberState);
         }
 
         public static boolean containsUndefined(BeaconState beaconState) {
@@ -638,6 +638,22 @@ public class RobotHardware {
                 default:
                     throw new IllegalArgumentException("Not a valid number state.");
             }
+        }
+
+        public BeaconState getBackState() {
+            if (numberState <= 0b00_11) {
+                throw new IllegalArgumentException("Not Merged!");
+            }
+
+            return getFromNumberState(numberState >> 2);
+        }
+
+        public BeaconState getFrontState() {
+            if (numberState <= 0b00_11) {
+                throw new IllegalArgumentException("Not Merged!");
+            }
+
+            return getFromNumberState(numberState & 0b00_11);
         }
 
         public boolean containsUndefined() {

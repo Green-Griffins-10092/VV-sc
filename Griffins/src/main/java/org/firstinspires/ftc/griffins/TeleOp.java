@@ -116,7 +116,7 @@ public abstract class TeleOp extends OpMode {
             turretState = false; //!gamepad2.left_stick_button && shooterPower == 0;
 
             if (gamepad2.x || gamepad2.b || gamepad2.right_stick_button) {
-                beaconPushRatio = 1;
+                beaconPushRatio = RobotHardware.BUTTON_PUSHER_RATIO;
             } else if (gamepad2.right_stick_x < -0.1) {
                 beaconPushRatio = -gamepad2.right_stick_x;
             } else if (gamepad2.right_stick_x > 0.1) {

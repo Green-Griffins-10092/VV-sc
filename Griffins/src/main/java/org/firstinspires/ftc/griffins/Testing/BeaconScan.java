@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.griffins.AutoFunctions;
 import org.firstinspires.ftc.griffins.AutoFunctions.DriveStraightDirection;
 import org.firstinspires.ftc.griffins.RobotHardware;
-import org.firstinspires.ftc.griffins.RobotHardware.BeaconState;
 
 /**
  * Created by David on 1/19/2017.
@@ -31,7 +30,7 @@ public class BeaconScan extends LinearOpMode {
 
         sleep(1000);
 
-        hardware.pushButton(hardware.findBeaconState(), BeaconState.RED);
+        //hardware.pushButton(hardware.findBeaconState(), BeaconState.RED);
 
         sleep(3000);
 

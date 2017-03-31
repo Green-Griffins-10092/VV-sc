@@ -37,7 +37,7 @@ public class AutoFunctions {
             hardware.setDrivePower(signedPower * powerRatio, signedPower);
     }
 
-    private double determineDrivePower(DriveStraightDirection defaultDirection) {
+    private double determineDrivePower(DriveStraightDirection defaultDirection, TurnDirection turnDirection) {
         RobotHardware.BeaconState beaconState = hardware.findBeaconState();
 
         double drivePower = 0;
@@ -45,8 +45,14 @@ public class AutoFunctions {
         if (beaconState.containsUndefined()) {
             if (beaconState == RobotHardware.BeaconState.UNDEFINED_UNDEFINED) {
                 drivePower = scanningSpeeds[1] * (defaultDirection == DriveStraightDirection.FORWARD ? 1 : -1);
-
             } else {
+
+                if (beaconState.getBackState() == RobotHardware.BeaconState.UNDEFINED) {
+                    defaultDirection = DriveStraightDirection.BACKWARD;
+                } else {
+                    defaultDirection = DriveStraightDirection.FORWARD;
+                }
+
                 drivePower = scanningSpeeds[0] * (defaultDirection == DriveStraightDirection.FORWARD ? 1 : -1);
             }
         }
@@ -55,13 +61,13 @@ public class AutoFunctions {
     }
 
     public void scanForBeacon(DriveStraightDirection defaultDirection, TurnDirection turnDirection) {
-        double drivePower = determineDrivePower(defaultDirection);
+        double drivePower = determineDrivePower(defaultDirection, turnDirection);
         double lastDrivePower = drivePower;
 
         while (linearOpMode.opModeIsActive() && drivePower != 0) {
             lastDrivePower = drivePower;
             wallDrive(drivePower, turnDirection);
-            drivePower = determineDrivePower(defaultDirection);
+            drivePower = determineDrivePower(defaultDirection, turnDirection);
         }
 
         hardware.stopDrive();

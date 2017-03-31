@@ -36,9 +36,9 @@ public class BeaconTest extends LinearOpMode {
         telemetry.addData("Beacon State", beaconState);
         telemetry.update();
         sleep(1000);
-        hardware.pushButton(beaconState, RobotHardware.BeaconState.RED);
+        //hardware.pushButton(beaconState, RobotHardware.BeaconState.RED);
         sleep(3000);
-        hardware.pushButton(RobotHardware.BeaconState.UNDEFINED, RobotHardware.BeaconState.RED);
+        //hardware.pushButton(RobotHardware.BeaconState.UNDEFINED, RobotHardware.BeaconState.RED);
         sleep(2000);
     }
 
