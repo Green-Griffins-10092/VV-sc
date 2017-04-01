@@ -72,7 +72,7 @@ public class RobotHardware {
     public static final I2cAddr LOADER_COLOR_SENSOR_ADDRESS = I2cAddr.create8bit(0x32);
     // The constants for the button pusher positions
     public static final double BUTTON_PUSHER_CENTER_POSITION = 97 / 255.0;
-    public static final double BUTTON_PUSHER_RATIO = 1 / 2.0;
+    public static final double BUTTON_PUSHER_RATIO = 1 / 3.0;
     public static final double BUTTON_PUSHER_LEFT_FULL_EXTENSION = 67 / 255.0;
     public static final double BUTTON_PUSHER_RIGHT_FULL_EXTENSION = 127 / 255.0;
     public static final double BUTTON_PUSHER_RETRACTED = 228 / 255.0;
@@ -132,6 +132,10 @@ public class RobotHardware {
     private DigitalChannel loaderParticleLimitSwitch;
     private BNO055IMU robotTracker;
     private double turretHeadingTarget;
+
+    //state variables
+    private boolean isLoaderColorSensorRegistered;
+    private boolean areBeaconColorSensorsRegistered;
 
     public RobotHardware() {
     }
@@ -413,31 +417,51 @@ public class RobotHardware {
     }
 
     public void deregisterBeaconColorSensors() {
-        leftButtonPusherColorSensor.getI2cController().deregisterForPortReadyCallback(leftButtonPusherColorSensor.getPort());
-        rightButtonPusherColorSensor.getI2cController().deregisterForPortReadyCallback(rightButtonPusherColorSensor.getPort());
-        leftSecondaryButtonPusherColorSensor.getI2cController()
-                .deregisterForPortReadyCallback(leftSecondaryButtonPusherColorSensor.getPort());
-        rightSecondaryButtonPusherColorSensor.getI2cController()
-                .deregisterForPortReadyCallback(rightSecondaryButtonPusherColorSensor.getPort());
+        if (areBeaconColorSensorsRegistered) {
+            leftButtonPusherColorSensor.getI2cController().deregisterForPortReadyCallback(leftButtonPusherColorSensor.getPort());
+            rightButtonPusherColorSensor.getI2cController().deregisterForPortReadyCallback(rightButtonPusherColorSensor.getPort());
+            leftSecondaryButtonPusherColorSensor.getI2cController()
+                    .deregisterForPortReadyCallback(leftSecondaryButtonPusherColorSensor.getPort());
+            rightSecondaryButtonPusherColorSensor.getI2cController()
+                    .deregisterForPortReadyCallback(rightSecondaryButtonPusherColorSensor.getPort());
+            areBeaconColorSensorsRegistered = false;
+        }
     }
 
     public void registerBeaconColorSensors() {
-        leftButtonPusherColorSensor.getI2cController()
-                .registerForI2cPortReadyCallback(leftButtonPusherColorSensor, leftButtonPusherColorSensor.getPort());
-        rightButtonPusherColorSensor.getI2cController()
-                .registerForI2cPortReadyCallback(rightButtonPusherColorSensor, rightButtonPusherColorSensor.getPort());
-        leftSecondaryButtonPusherColorSensor.getI2cController()
-                .registerForI2cPortReadyCallback(leftSecondaryButtonPusherColorSensor, leftSecondaryButtonPusherColorSensor.getPort());
-        rightSecondaryButtonPusherColorSensor.getI2cController()
-                .registerForI2cPortReadyCallback(rightSecondaryButtonPusherColorSensor, rightSecondaryButtonPusherColorSensor.getPort());
+        if (!areBeaconColorSensorsRegistered) {
+            leftButtonPusherColorSensor.getI2cController()
+                    .registerForI2cPortReadyCallback(leftButtonPusherColorSensor, leftButtonPusherColorSensor.getPort());
+            rightButtonPusherColorSensor.getI2cController()
+                    .registerForI2cPortReadyCallback(rightButtonPusherColorSensor, rightButtonPusherColorSensor.getPort());
+            leftSecondaryButtonPusherColorSensor.getI2cController()
+                    .registerForI2cPortReadyCallback(leftSecondaryButtonPusherColorSensor, leftSecondaryButtonPusherColorSensor.getPort());
+            rightSecondaryButtonPusherColorSensor.getI2cController()
+                    .registerForI2cPortReadyCallback(rightSecondaryButtonPusherColorSensor, rightSecondaryButtonPusherColorSensor.getPort());
+            areBeaconColorSensorsRegistered = true;
+        }
     }
 
     public void deregisterLoaderColorSensor() {
-        loaderColorSensor.getI2cController().deregisterForPortReadyCallback(loaderColorSensor.getPort());
+        if (isLoaderColorSensorRegistered) {
+            loaderColorSensor.getI2cController().deregisterForPortReadyCallback(loaderColorSensor.getPort());
+            isLoaderColorSensorRegistered = false;
+        }
     }
 
     public void registerLoaderColorSensor() {
-        loaderColorSensor.getI2cController().registerForI2cPortReadyCallback(loaderColorSensor, loaderColorSensor.getPort());
+        if (!isLoaderColorSensorRegistered) {
+            loaderColorSensor.getI2cController().registerForI2cPortReadyCallback(loaderColorSensor, loaderColorSensor.getPort());
+            isLoaderColorSensorRegistered = true;
+        }
+    }
+
+    public boolean areBeaconColorSensorsRegistered() {
+        return areBeaconColorSensorsRegistered;
+    }
+
+    public boolean isLoaderColorSensorRegistered() {
+        return isLoaderColorSensorRegistered;
     }
 
     /**

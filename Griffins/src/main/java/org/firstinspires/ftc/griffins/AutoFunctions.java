@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.griffins.Navigation.LinearOpModeTimeOutFunc;
 import org.firstinspires.ftc.griffins.Navigation.PIDDrive;
 import org.firstinspires.ftc.griffins.Navigation.PIDRate;
+import org.firstinspires.ftc.griffins.RobotHardware.BeaconState;
+import org.firstinspires.ftc.robotcore.external.Func;
 
 /**
  * Created by David on 11/28/2016.
@@ -16,16 +18,34 @@ import org.firstinspires.ftc.griffins.Navigation.PIDRate;
 
 public class AutoFunctions {
     public static double[] scanningSpeeds = {0.05, 0.15};
+
     private LinearOpMode linearOpMode;
     private RobotHardware hardware;
     private PIDDrive drive;
     private PIDRate rate;
+    private BeaconState alliance;
+    //AutoLoadTimeOutFunc 'static' variables
+    private ElapsedTime reverseTimer = new ElapsedTime(0);
+    private ElapsedTime loaderTimer = new ElapsedTime(0);
 
     public AutoFunctions(RobotHardware hardware, LinearOpMode linearOpMode) {
+        this(hardware, linearOpMode, null);
+    }
+
+    public AutoFunctions(RobotHardware hardware, LinearOpMode linearOpMode, BeaconState alliance) {
         this.hardware = hardware;
         this.linearOpMode = linearOpMode;
         drive = new PIDDrive(hardware);
         rate = new PIDRate(hardware);
+        this.alliance = alliance;
+    }
+
+    public BeaconState getAlliance() {
+        return alliance;
+    }
+
+    public void setAlliance(BeaconState alliance) {
+        this.alliance = alliance;
     }
 
     public void wallDrive(double signedPower, TurnDirection turnDirection) {
@@ -38,19 +58,19 @@ public class AutoFunctions {
     }
 
     private double determineDrivePower(DriveStraightDirection defaultDirection, TurnDirection turnDirection) {
-        RobotHardware.BeaconState beaconState = hardware.findBeaconState();
+        BeaconState beaconState = hardware.findBeaconState();
 
         double drivePower = 0;
 
         if (beaconState.containsUndefined()) {
-            if (beaconState == RobotHardware.BeaconState.UNDEFINED_UNDEFINED) {
+            if (beaconState == BeaconState.UNDEFINED_UNDEFINED) {
                 drivePower = scanningSpeeds[1] * (defaultDirection == DriveStraightDirection.FORWARD ? 1 : -1);
             } else {
 
-                if (beaconState.getBackState() == RobotHardware.BeaconState.UNDEFINED) {
-                    defaultDirection = DriveStraightDirection.BACKWARD;
-                } else {
+                if (beaconState.getBackState() == BeaconState.UNDEFINED) {
                     defaultDirection = DriveStraightDirection.FORWARD;
+                } else {
+                    defaultDirection = DriveStraightDirection.BACKWARD;
                 }
 
                 drivePower = scanningSpeeds[0] * (defaultDirection == DriveStraightDirection.FORWARD ? 1 : -1);
@@ -64,7 +84,9 @@ public class AutoFunctions {
         double drivePower = determineDrivePower(defaultDirection, turnDirection);
         double lastDrivePower = drivePower;
 
-        while (linearOpMode.opModeIsActive() && drivePower != 0) {
+        Func<Boolean> timeout = new AutoLoadTimeOutFunc(linearOpMode, 5);
+
+        while (timeout.value() && drivePower != 0) {
             lastDrivePower = drivePower;
             wallDrive(drivePower, turnDirection);
             drivePower = determineDrivePower(defaultDirection, turnDirection);
@@ -339,7 +361,7 @@ public class AutoFunctions {
         hardware.getRightDrive().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void pushBeacon(RobotHardware.BeaconState alliance) {
+    public void pushBeacon(BeaconState alliance) {
         /*if (linearOpMode.opModeIsActive()) {
             hardware.pushButton(hardware.findBeaconState(), alliance);
             linearOpMode.sleep(1900);
@@ -376,11 +398,11 @@ public class AutoFunctions {
         }
     }
 
-    public void autoLoad(RobotHardware.BeaconState alliance) {
+    public void autoLoad(BeaconState alliance) {
         double loaderPower;
         double intakePower = 1.0;
 
-        RobotHardware.BeaconState ball = hardware.findParticleColor();
+        BeaconState ball = hardware.findParticleColor();
 
         if (ball == alliance) {
             loaderPower = 1;
@@ -404,7 +426,7 @@ public class AutoFunctions {
 
     public void driveStraightPID(double inches, DriveStraightDirection direction, double timeoutSeconds, boolean quickExit) {
         drive.setDriveTarget(inches * (direction == DriveStraightDirection.FORWARD ? 1 : -1));
-        drive.driveToTarget(new LinearOpModeTimeOutFunc(linearOpMode, timeoutSeconds), linearOpMode.telemetry);
+        drive.driveToTarget(new AutoLoadTimeOutFunc(linearOpMode, timeoutSeconds), linearOpMode.telemetry);
     }
 
     public void driveStraightPID(double inches, DriveStraightDirection direction, boolean quickExit) {
@@ -421,7 +443,7 @@ public class AutoFunctions {
 
     public String twoWheelTurnPID(double degrees, TurnDirection direction, double timeoutSeconds, boolean quickExit) {
         drive.setTurnTarget(degrees * (direction == TurnDirection.LEFT ? 1 : -1));
-        return drive.driveToTarget(new LinearOpModeTimeOutFunc(linearOpMode, timeoutSeconds), linearOpMode.telemetry, quickExit);
+        return drive.driveToTarget(new AutoLoadTimeOutFunc(linearOpMode, timeoutSeconds), linearOpMode.telemetry, quickExit);
     }
 
     public String twoWheelTurnPID(double degrees, TurnDirection direction, boolean quickExit) {
@@ -450,10 +472,65 @@ public class AutoFunctions {
             leftBias = .9;
             rightBias = 1;
         }
-        drive.wallDriveToTarget(leftBias, rightBias, new LinearOpModeTimeOutFunc(linearOpMode, timeoutSeconds));
+        drive.wallDriveToTarget(leftBias, rightBias, new AutoLoadTimeOutFunc(linearOpMode, timeoutSeconds));
+    }
+
+    public void autoLoadingSleep(int milliseconds) {
+        AutoLoadTimeOutFunc timeOutFunc = new AutoLoadTimeOutFunc(linearOpMode, milliseconds / 1000.0);
+        while (timeOutFunc.value())
+            linearOpMode.telemetry.update();
+    }
+
+    public void AutoLoadingTest() {
+        AutoLoadTimeOutFunc autoLoadTimeOutFunc = new AutoLoadTimeOutFunc(linearOpMode, 30);
+
+        while (autoLoadTimeOutFunc.value())
+            linearOpMode.telemetry.update();
     }
 
     public enum DriveStraightDirection {FORWARD, BACKWARD}
-
     public enum TurnDirection {RIGHT, LEFT}
+
+    public class AutoLoadTimeOutFunc extends LinearOpModeTimeOutFunc {
+
+        public AutoLoadTimeOutFunc(LinearOpMode opMode, double timeOutLengthSeconds) {
+            super(opMode, timeOutLengthSeconds);
+            hardware.registerLoaderColorSensor();
+        }
+
+        @Override
+        public Boolean value() {
+
+            if (alliance != null) {
+                double loaderPower = loaderTimer.milliseconds() > 200 ? 0 : .5;
+                ;
+                double intakePower = reverseTimer.milliseconds() > 500 ? 1 : -1;
+
+                BeaconState ball = hardware.findParticleColor();
+
+                if (ball == alliance) { // particle is our color
+                    loaderPower = 1;
+                    intakePower = 1;
+                    loaderTimer.reset();
+                } else if (!ball.containsUndefined()) { // particle is not our color
+                    loaderPower = -1;
+                    intakePower = -1;
+                    reverseTimer.reset();
+                    loaderTimer.reset();
+                }
+
+                hardware.getIntake().setPower(intakePower);
+                hardware.setLoaderPower(loaderPower);
+
+                linearOpMode.telemetry.addData("Particle Color", ball);
+                linearOpMode.telemetry.addData("Loader Power", loaderPower);
+                linearOpMode.telemetry.addData("Intake Power", intakePower);
+                linearOpMode.telemetry.addData("Timer Value", reverseTimer.milliseconds());
+
+            }
+
+
+            return super.value();
+        }
+    }
 }
