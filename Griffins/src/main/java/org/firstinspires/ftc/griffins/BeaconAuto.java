@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.griffins;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
  * Created by David on 3/25/2017.
@@ -36,6 +37,8 @@ public abstract class BeaconAuto extends LinearOpMode {
             notColor = RobotHardware.BeaconState.BLUE;
         }
 
+        telemetry.log().add("versioning 5");
+
         waitForStart();
 
         while (opModeIsActive() && hardware.getTurretGyro().isCalibrating()) ;
@@ -52,9 +55,11 @@ public abstract class BeaconAuto extends LinearOpMode {
         hardware.getIntake().setPower(0);
 
         //drive toward beacon wall
-        autoFunctions.driveStraightPID(64, AutoFunctions.DriveStraightDirection.FORWARD, 3, true);
+        autoFunctions.driveStraightPID(45, AutoFunctions.DriveStraightDirection.FORWARD, 3, true);
         telemetry.log().add("Arrived at beacon wall");
         telemetry.update();
+
+        autoFunctions.setAlliance(color);
 
         //autoFunctions.driveStraightPID(1, AutoFunctions.DriveStraightDirection.BACKWARD, 1);
 
@@ -67,15 +72,12 @@ public abstract class BeaconAuto extends LinearOpMode {
         hardware.registerBeaconColorSensors();
         hardware.registerLoaderColorSensor();
 
-        autoFunctions.driveStraightPID(28, AutoFunctions.DriveStraightDirection.FORWARD, 1.5, true);
+        autoFunctions.driveStraightPID(18, AutoFunctions.DriveStraightDirection.FORWARD, 1.5, true);
+        autoFunctions.wallPIDDrive(18, AutoFunctions.DriveStraightDirection.FORWARD, toWall, 2);
 
         //autoFunctions.twoWheelTurnPID(20, AutoFunctions.TurnDirection.RIGHT, .3, true); //timer out
 
         hardware.stopDrive();
-
-        if (hardware.findParticleColor() == notColor) {
-            hardware.setLoaderPower(-1);
-        }
 
         autoFunctions.scanForBeacon(AutoFunctions.DriveStraightDirection.FORWARD, toWall);
 
@@ -83,26 +85,49 @@ public abstract class BeaconAuto extends LinearOpMode {
 
         setDrivePower(-0.2, -0.1);
 
-        sleep(200);
+        autoFunctions.autoLoadingSleep(200);
 
         setDrivePower(-0.3, 0.3);
 
-        sleep(200);
+        autoFunctions.autoLoadingSleep(200);
         hardware.stopDrive();
 
-        autoFunctions.pushBeacon(color);
+        RobotHardware.BeaconState beaconState;
+        if (alliance == Alliance.BLUE_ALLIANCE) {
+            beaconState = hardware.findRightBeaconState();
+        } else {
+            beaconState = hardware.findLeftBeaconState();
+        }
+
+        autoFunctions.pushBeacon(color, beaconState);
 
         //autoFunctions.twoWheelTurnPID(45, AutoFunctions.TurnDirection.LEFT, 0.5, true); //timer out
         autoFunctions.wallPIDDrive(40, AutoFunctions.DriveStraightDirection.BACKWARD, toWall, 2);
 
-        autoFunctions.scanForBeacon(AutoFunctions.DriveStraightDirection.BACKWARD, toWall);
+        //autoFunctions.scanForBeacon(AutoFunctions.DriveStraightDirection.BACKWARD, toWall);
 
         setDrivePower(-0.2, -0.1);
 
-        sleep(200);
+        autoFunctions.autoLoadingSleep(200);
         hardware.stopDrive();
 
-        autoFunctions.pushBeacon(color);
+        hardware.getIntake().setPower(0);
+        hardware.getTurretRotation().setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        hardware.getTurretRotation().setTargetPosition((int) (hardware.getTurretRotation().getCurrentPosition() +
+                (toWall == AutoFunctions.TurnDirection.LEFT ? 1 : -1) * RobotHardware.ENCODER_COUNTS_PER_TURRET_REVOLUTION / 10));
+        hardware.getTurretRotation().setPower(.5);
+
+        if (alliance == Alliance.BLUE_ALLIANCE) {
+            beaconState = hardware.findRightBeaconState();
+        } else {
+            beaconState = hardware.findLeftBeaconState();
+        }
+
+        autoFunctions.pushBeacon(color, beaconState);
+
+        while (this.opModeIsActive() && hardware.getTurretRotation().isBusy())
+            hardware.getTurretRotation().setPower(.5);
+        autoFunctions.shoot();
 
         setDrivePower(0.2, 0.3);
         sleep(800);

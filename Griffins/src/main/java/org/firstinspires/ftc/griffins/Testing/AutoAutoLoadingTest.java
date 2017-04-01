@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.griffins.Testing;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.griffins.AutoFunctions;
@@ -11,6 +12,7 @@ import org.firstinspires.ftc.griffins.RobotHardware;
  */
 
 @Autonomous
+@Disabled
 public class AutoAutoLoadingTest extends LinearOpMode {
 
     @Override

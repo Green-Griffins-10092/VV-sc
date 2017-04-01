@@ -138,6 +138,8 @@ public class RobotHardware {
     private boolean areBeaconColorSensorsRegistered;
 
     public RobotHardware() {
+        isLoaderColorSensorRegistered = true;
+        areBeaconColorSensorsRegistered = true;
     }
 
     public void initialize(HardwareMap hardwareMap) {

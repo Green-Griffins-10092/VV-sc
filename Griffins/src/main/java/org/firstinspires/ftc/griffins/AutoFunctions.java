@@ -101,6 +101,7 @@ public class AutoFunctions {
             drivePower = determineDrivePower(defaultDirection, turnDirection);
         }
 
+        hardware.setLoaderPower(0);
         hardware.stopDrive();
     }
 
@@ -381,7 +382,7 @@ public class AutoFunctions {
 
     public void shoot(){
         if (linearOpMode.opModeIsActive()){
-            hardware.getShooter().setPower(.8);
+            hardware.getShooter().setPower(.9);
             linearOpMode.sleep(500);
             hardware.setLoaderPower(1.0);
             linearOpMode.sleep(1000);
@@ -436,6 +437,7 @@ public class AutoFunctions {
     public void driveStraightPID(double inches, DriveStraightDirection direction, double timeoutSeconds, boolean quickExit) {
         drive.setDriveTarget(inches * (direction == DriveStraightDirection.FORWARD ? 1 : -1));
         drive.driveToTarget(new AutoLoadTimeOutFunc(linearOpMode, timeoutSeconds), linearOpMode.telemetry);
+        hardware.setLoaderPower(0);
     }
 
     public void driveStraightPID(double inches, DriveStraightDirection direction, boolean quickExit) {
@@ -452,7 +454,9 @@ public class AutoFunctions {
 
     public String twoWheelTurnPID(double degrees, TurnDirection direction, double timeoutSeconds, boolean quickExit) {
         drive.setTurnTarget(degrees * (direction == TurnDirection.LEFT ? 1 : -1));
-        return drive.driveToTarget(new AutoLoadTimeOutFunc(linearOpMode, timeoutSeconds), linearOpMode.telemetry, quickExit);
+        String data = drive.driveToTarget(new AutoLoadTimeOutFunc(linearOpMode, timeoutSeconds), linearOpMode.telemetry, quickExit);
+        hardware.setLoaderPower(0);
+        return data;
     }
 
     public String twoWheelTurnPID(double degrees, TurnDirection direction, boolean quickExit) {
@@ -482,6 +486,7 @@ public class AutoFunctions {
             rightBias = 1;
         }
         drive.wallDriveToTarget(leftBias, rightBias, new AutoLoadTimeOutFunc(linearOpMode, timeoutSeconds));
+        hardware.setLoaderPower(0);
     }
 
     public void pushBeacon(BeaconState beaconState, BeaconState alliance) {
@@ -520,6 +525,7 @@ public class AutoFunctions {
         AutoLoadTimeOutFunc timeOutFunc = new AutoLoadTimeOutFunc(linearOpMode, milliseconds / 1000.0);
         while (timeOutFunc.value())
             linearOpMode.telemetry.update();
+        hardware.setLoaderPower(0);
     }
 
     public void AutoLoadingTest() {
@@ -544,7 +550,6 @@ public class AutoFunctions {
 
             if (alliance != null) {
                 double loaderPower = loaderTimer.milliseconds() > 200 ? 0 : .5;
-                ;
                 double intakePower = reverseTimer.milliseconds() > 500 ? 1 : -1;
 
                 BeaconState ball = hardware.findParticleColor();
