@@ -12,6 +12,15 @@ import org.firstinspires.ftc.griffins.Navigation.PIDRate;
 import org.firstinspires.ftc.griffins.RobotHardware.BeaconState;
 import org.firstinspires.ftc.robotcore.external.Func;
 
+import static org.firstinspires.ftc.griffins.RobotHardware.BUTTON_PUSHER_RATIO;
+import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.BLUE;
+import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.BLUE_BLUE;
+import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.BLUE_RED;
+import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.RED;
+import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.RED_BLUE;
+import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.RED_RED;
+import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.guessBeaconState;
+
 /**
  * Created by David on 11/28/2016.
  */
@@ -473,6 +482,38 @@ public class AutoFunctions {
             rightBias = 1;
         }
         drive.wallDriveToTarget(leftBias, rightBias, new AutoLoadTimeOutFunc(linearOpMode, timeoutSeconds));
+    }
+
+    public void pushBeacon(BeaconState beaconState, BeaconState alliance) {
+
+        beaconState = guessBeaconState(beaconState);
+        if (alliance == BLUE) {
+            if (beaconState == BLUE_RED) {
+                hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
+            } else if (beaconState == RED_BLUE) {
+                wallPIDDrive(5, DriveStraightDirection.FORWARD, TurnDirection.RIGHT, 1);
+                hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
+            } else if (beaconState == BLUE_BLUE) {
+                hardware.retractButtonPusher();
+            } else if (beaconState == RED_RED) {
+                hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
+            }
+        } else if (alliance == RED) {
+            if (beaconState == BLUE_RED) {
+                wallPIDDrive(5, DriveStraightDirection.FORWARD, TurnDirection.LEFT, 1);
+                hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
+            } else if (beaconState == RED_BLUE) {
+                hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
+            } else if (beaconState == BLUE_BLUE) {
+                hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
+            } else if (beaconState == RED_RED) {
+                hardware.retractButtonPusher();
+            }
+        }
+
+        autoLoadingSleep(2000);
+        hardware.retractButtonPusher();
+        autoLoadingSleep(1000);
     }
 
     public void autoLoadingSleep(int milliseconds) {
