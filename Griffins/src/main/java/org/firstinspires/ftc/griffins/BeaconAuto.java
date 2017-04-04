@@ -37,7 +37,7 @@ public abstract class BeaconAuto extends LinearOpMode {
             notColor = RobotHardware.BeaconState.BLUE;
         }
 
-        telemetry.log().add("versioning 5");
+        telemetry.log().add("versioning 8");
 
         waitForStart();
 
@@ -55,13 +55,13 @@ public abstract class BeaconAuto extends LinearOpMode {
         hardware.getIntake().setPower(0);
 
         //drive toward beacon wall
-        autoFunctions.driveStraightPID(45, AutoFunctions.DriveStraightDirection.FORWARD, 3, true);
+        autoFunctions.driveStraightPID(50, AutoFunctions.DriveStraightDirection.FORWARD, 3, true);
         telemetry.log().add("Arrived at beacon wall");
         telemetry.update();
 
         autoFunctions.setAlliance(color);
 
-        //autoFunctions.driveStraightPID(1, AutoFunctions.DriveStraightDirection.BACKWARD, 1);
+        autoFunctions.driveStraightPID(2, AutoFunctions.DriveStraightDirection.BACKWARD, 1);
 
         angle -= autoFunctions.getZAngle();
 
@@ -83,23 +83,16 @@ public abstract class BeaconAuto extends LinearOpMode {
 
         hardware.setLoaderPower(0);
 
-        setDrivePower(-0.2, -0.1);
+        setDrivePower(0.2, 0.1);
 
-        autoFunctions.autoLoadingSleep(200);
+        autoFunctions.autoLoadingSleep(500);
 
-        setDrivePower(-0.3, 0.3);
+        /*setDrivePower(-0.3, 0.3);
 
-        autoFunctions.autoLoadingSleep(200);
+        autoFunctions.autoLoadingSleep(200);*/
         hardware.stopDrive();
 
-        RobotHardware.BeaconState beaconState;
-        if (alliance == Alliance.BLUE_ALLIANCE) {
-            beaconState = hardware.findRightBeaconState();
-        } else {
-            beaconState = hardware.findLeftBeaconState();
-        }
-
-        autoFunctions.pushBeacon(color, beaconState);
+        autoFunctions.pushBeacon(color);
 
         //autoFunctions.twoWheelTurnPID(45, AutoFunctions.TurnDirection.LEFT, 0.5, true); //timer out
         autoFunctions.wallPIDDrive(40, AutoFunctions.DriveStraightDirection.BACKWARD, toWall, 2);
@@ -108,7 +101,7 @@ public abstract class BeaconAuto extends LinearOpMode {
 
         setDrivePower(-0.2, -0.1);
 
-        autoFunctions.autoLoadingSleep(200);
+        autoFunctions.autoLoadingSleep(500);
         hardware.stopDrive();
 
         hardware.getIntake().setPower(0);
@@ -117,13 +110,7 @@ public abstract class BeaconAuto extends LinearOpMode {
                 (toWall == AutoFunctions.TurnDirection.LEFT ? 1 : -1) * RobotHardware.ENCODER_COUNTS_PER_TURRET_REVOLUTION / 10));
         hardware.getTurretRotation().setPower(.5);
 
-        if (alliance == Alliance.BLUE_ALLIANCE) {
-            beaconState = hardware.findRightBeaconState();
-        } else {
-            beaconState = hardware.findLeftBeaconState();
-        }
-
-        autoFunctions.pushBeacon(color, beaconState);
+        autoFunctions.pushBeacon(color);
 
         while (this.opModeIsActive() && hardware.getTurretRotation().isBusy())
             hardware.getTurretRotation().setPower(.5);

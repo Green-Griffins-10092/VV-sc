@@ -26,7 +26,7 @@ import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.guessBeac
  */
 
 public class AutoFunctions {
-    public static double[] scanningSpeeds = {0.05, 0.15};
+    public static double[] scanningSpeeds = {0.05, 0.10};
 
     private LinearOpMode linearOpMode;
     private RobotHardware hardware;
@@ -67,7 +67,12 @@ public class AutoFunctions {
     }
 
     private double determineDrivePower(DriveStraightDirection defaultDirection, TurnDirection turnDirection) {
-        BeaconState beaconState = hardware.findBeaconState();
+        BeaconState beaconState;
+        if (turnDirection == TurnDirection.RIGHT) {
+            beaconState = hardware.findRightBeaconState();
+        } else {
+            beaconState = hardware.findLeftBeaconState();
+        }
 
         double drivePower = 0;
 
@@ -76,11 +81,11 @@ public class AutoFunctions {
                 drivePower = scanningSpeeds[1] * (defaultDirection == DriveStraightDirection.FORWARD ? 1 : -1);
             } else {
 
-                if (beaconState.getBackState() == BeaconState.UNDEFINED) {
+                /*if (beaconState.getBackState() == BeaconState.UNDEFINED) {
                     defaultDirection = DriveStraightDirection.FORWARD;
                 } else {
                     defaultDirection = DriveStraightDirection.BACKWARD;
-                }
+                }*/
 
                 drivePower = scanningSpeeds[0] * (defaultDirection == DriveStraightDirection.FORWARD ? 1 : -1);
             }
@@ -93,7 +98,7 @@ public class AutoFunctions {
         double drivePower = determineDrivePower(defaultDirection, turnDirection);
         double lastDrivePower = drivePower;
 
-        Func<Boolean> timeout = new AutoLoadTimeOutFunc(linearOpMode, 5);
+        Func<Boolean> timeout = new AutoLoadTimeOutFunc(linearOpMode, 15);
 
         while (timeout.value() && drivePower != 0) {
             lastDrivePower = drivePower;
@@ -371,13 +376,52 @@ public class AutoFunctions {
         hardware.getRightDrive().setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
+    public void pushBeacon(BeaconState beaconState, BeaconState alliance) {
+        if (linearOpMode.opModeIsActive()) {
+            beaconState = guessBeaconState(beaconState);
+            if (alliance == BLUE) {
+                if (beaconState == BLUE_RED) {
+                    hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
+                } else if (beaconState == RED_BLUE) {
+                    wallPIDDrive(5, DriveStraightDirection.FORWARD, TurnDirection.RIGHT, 1);
+                    hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
+                } else if (beaconState == BLUE_BLUE) {
+                    hardware.retractButtonPusher();
+                } else if (beaconState == RED_RED) {
+                    hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
+                }
+            } else if (alliance == RED) {
+                if (beaconState == BLUE_RED) {
+                    wallPIDDrive(5, DriveStraightDirection.FORWARD, TurnDirection.LEFT, 1);
+                    hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
+                } else if (beaconState == RED_BLUE) {
+                    hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
+                } else if (beaconState == BLUE_BLUE) {
+                    hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
+                } else if (beaconState == RED_RED) {
+                    hardware.retractButtonPusher();
+                }
+            }
+
+            autoLoadingSleep(2000);
+            hardware.retractButtonPusher();
+            autoLoadingSleep(1000);
+        }
+    }
+
     public void pushBeacon(BeaconState alliance) {
-        /*if (linearOpMode.opModeIsActive()) {
-            hardware.pushButton(hardware.findBeaconState(), alliance);
-            linearOpMode.sleep(1900);
-            hardware.pushButton(RobotHardware.BeaconState.UNDEFINED, alliance);
-            linearOpMode.sleep(700);
-        }*/
+        RobotHardware.BeaconState beaconState;
+        if (alliance == BLUE) {
+            beaconState = hardware.findRightBeaconState();
+        } else {
+            beaconState = hardware.findLeftBeaconState();
+        }
+
+        pushBeacon(beaconState, alliance);
+    }
+
+    public void pushBeacon() {
+        pushBeacon(alliance);
     }
 
     public void shoot(){
@@ -487,38 +531,6 @@ public class AutoFunctions {
         }
         drive.wallDriveToTarget(leftBias, rightBias, new AutoLoadTimeOutFunc(linearOpMode, timeoutSeconds));
         hardware.setLoaderPower(0);
-    }
-
-    public void pushBeacon(BeaconState beaconState, BeaconState alliance) {
-
-        beaconState = guessBeaconState(beaconState);
-        if (alliance == BLUE) {
-            if (beaconState == BLUE_RED) {
-                hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
-            } else if (beaconState == RED_BLUE) {
-                wallPIDDrive(5, DriveStraightDirection.FORWARD, TurnDirection.RIGHT, 1);
-                hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
-            } else if (beaconState == BLUE_BLUE) {
-                hardware.retractButtonPusher();
-            } else if (beaconState == RED_RED) {
-                hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
-            }
-        } else if (alliance == RED) {
-            if (beaconState == BLUE_RED) {
-                wallPIDDrive(5, DriveStraightDirection.FORWARD, TurnDirection.LEFT, 1);
-                hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
-            } else if (beaconState == RED_BLUE) {
-                hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
-            } else if (beaconState == BLUE_BLUE) {
-                hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
-            } else if (beaconState == RED_RED) {
-                hardware.retractButtonPusher();
-            }
-        }
-
-        autoLoadingSleep(2000);
-        hardware.retractButtonPusher();
-        autoLoadingSleep(1000);
     }
 
     public void autoLoadingSleep(int milliseconds) {

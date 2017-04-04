@@ -43,7 +43,7 @@ public class PIDDrive {
             }
         }, null);
 
-        pidDrivingDifference = new PIDController(0.001 * ENCODER_COUNTS_PER_ROBOT_DEGREE, 0, 0, 0, new Func<Double>() {
+        pidDrivingDifference = new PIDController(0.003 * ENCODER_COUNTS_PER_ROBOT_DEGREE, 0, 0, 0, new Func<Double>() {
             @Override
             public Double value() {
                 return (double) -hardware.getTurretGyro().getIntegratedZValue();

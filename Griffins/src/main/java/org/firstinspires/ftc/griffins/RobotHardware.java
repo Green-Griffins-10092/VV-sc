@@ -72,10 +72,10 @@ public class RobotHardware {
     public static final I2cAddr LOADER_COLOR_SENSOR_ADDRESS = I2cAddr.create8bit(0x32);
     // The constants for the button pusher positions
     public static final double BUTTON_PUSHER_CENTER_POSITION = 97 / 255.0;
-    public static final double BUTTON_PUSHER_RATIO = 1 / 3.0;
+    public static final double BUTTON_PUSHER_RATIO = 1 / 2.0;
     public static final double BUTTON_PUSHER_LEFT_FULL_EXTENSION = 67 / 255.0;
     public static final double BUTTON_PUSHER_RIGHT_FULL_EXTENSION = 127 / 255.0;
-    public static final double BUTTON_PUSHER_RETRACTED = 228 / 255.0;
+    public static final double BUTTON_PUSHER_RETRACTED = 213 / 255.0;
     public static final double BUTTON_PUSHER_EXTENDED = 123 / 255.0;
     // The constants for the loader speeds
     public static final double LOADER_ZERO_POWER = 0;
@@ -543,7 +543,7 @@ public class RobotHardware {
     private BeaconState findColorSensorState(ColorSensor colorSensor) {
         BeaconState colorState = UNDEFINED;
 
-        if (colorSensor.alpha() > 1) {
+        if (colorSensor.alpha() > 0) {
             if (colorSensor.red() > colorSensor.blue() + 1 && colorSensor.red() > colorSensor.green()) {
                 colorState = RED;
             } else if (colorSensor.blue() > colorSensor.red() + 1 && colorSensor.blue() > colorSensor.green()) {
@@ -623,7 +623,7 @@ public class RobotHardware {
 
         public static BeaconState guessBeaconState(BeaconState containsUndefined) {
             if (containsUndefined.numberState <= 0b00_11 || containsUndefined == UNDEFINED_UNDEFINED) {
-                throw new IllegalArgumentException("Insufficient data");
+                throw new IllegalArgumentException("Insufficient data: " + containsUndefined);
             }
 
             if ((containsUndefined.numberState & 0b00_11) == UNDEFINED.numberState) {
