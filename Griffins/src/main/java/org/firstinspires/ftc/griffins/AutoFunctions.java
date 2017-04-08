@@ -26,7 +26,7 @@ import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.guessBeac
  */
 
 public class AutoFunctions {
-    public static double[] scanningSpeeds = {0.05, 0.10};
+    public static double[] scanningSpeeds = {0.07, 0.15};
 
     private LinearOpMode linearOpMode;
     private RobotHardware hardware;
@@ -84,7 +84,7 @@ public class AutoFunctions {
 
         if (beaconState.containsUndefined()) {
             if (beaconState == BeaconState.UNDEFINED_UNDEFINED) {
-                drivePower = scanningSpeeds[1] * (defaultDirection == DriveStraightDirection.FORWARD ? 1 : -1);
+                drivePower = scanningSpeeds[1] * (defaultDirection == DriveStraightDirection.FORWARD ? 1 : -1.1);
             } else {
 
                 /*if (beaconState.getBackState() == BeaconState.UNDEFINED) {
@@ -93,7 +93,7 @@ public class AutoFunctions {
                     defaultDirection = DriveStraightDirection.BACKWARD;
                 }*/
 
-                drivePower = scanningSpeeds[0] * (defaultDirection == DriveStraightDirection.FORWARD ? 1 : -1);
+                drivePower = scanningSpeeds[0] * (defaultDirection == DriveStraightDirection.FORWARD ? 1 : -1.1);
             }
         }
 
@@ -384,11 +384,9 @@ public class AutoFunctions {
     }
 
     public void pushBeacon(BeaconState beaconState, BeaconState alliance) {
-
-
         if (linearOpMode.opModeIsActive()) {
             beaconState = guessBeaconState(beaconState);
-            int inchesBetweenButtons = 5;
+            double inchesBetweenButtons = 4.5;
             if (alliance == BLUE) {
                 if (beaconState == BLUE_RED) {
                     hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
@@ -436,7 +434,7 @@ public class AutoFunctions {
 
     public void shoot(){
         if (linearOpMode.opModeIsActive()){
-            hardware.getShooter().setPower(.9);
+            hardware.getShooter().setPower(.78);
             linearOpMode.sleep(500);
             hardware.setLoaderPower(1.0);
             linearOpMode.sleep(1000);
@@ -534,9 +532,9 @@ public class AutoFunctions {
         double leftBias = 0, rightBias = 0;
         if (turnDirection == TurnDirection.RIGHT) {
             leftBias = 1;
-            rightBias = .9;
+            rightBias = .8;
         } else if (turnDirection == TurnDirection.LEFT) {
-            leftBias = .9;
+            leftBias = .8;
             rightBias = 1;
         }
         drive.wallDriveToTarget(leftBias, rightBias, new AutoLoadTimeOutFunc(linearOpMode, timeoutSeconds));
