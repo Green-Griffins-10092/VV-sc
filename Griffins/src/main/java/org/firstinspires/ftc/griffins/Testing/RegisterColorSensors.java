@@ -25,35 +25,15 @@ public class RegisterColorSensors extends LinearOpMode {
 
         hardware.registerBeaconColorSensors();
 
-        LinearOpModeTimeOutFunc timeOutFunc = new LinearOpModeTimeOutFunc(this, 2);
+        LinearOpModeTimeOutFunc timeOutFunc = new LinearOpModeTimeOutFunc(this, 10);
         while (timeOutFunc.value()) {
-            telemetry.addData("color sensor data", Integer.toHexString(hardware.getLeftButtonPusherColorSensor().argb()));
-            telemetry.addData("color sensor data", Integer.toHexString(hardware.getRightButtonPusherColorSensor().argb()));
+            telemetry.addData("back left sensor data", Integer.toHexString(hardware.getLeftButtonPusherColorSensor().argb()));
+            telemetry.addData("back right sensor data", Integer.toHexString(hardware.getRightButtonPusherColorSensor().argb()));
+            telemetry.addData("front left sensor data", Integer.toHexString(hardware.getLeftSecondaryButtonPusherColorSensor().argb()));
+            telemetry.addData("front right sensor data", Integer.toHexString(hardware.getRightSecondaryButtonPusherColorSensor().argb()));
             telemetry.update();
         }
 
         telemetry.update();
-        sleep(1000);
-
-        hardware.deregisterBeaconColorSensors();
-
-        timeOutFunc = new LinearOpModeTimeOutFunc(this, 2);
-        while (timeOutFunc.value()) {
-            telemetry.addData("color sensor data", Integer.toHexString(hardware.getLeftButtonPusherColorSensor().argb()));
-            telemetry.addData("color sensor data", Integer.toHexString(hardware.getRightButtonPusherColorSensor().argb()));
-            telemetry.update();
-        }
-
-        telemetry.update();
-        sleep(1000);
-
-        hardware.registerBeaconColorSensors();
-
-        timeOutFunc = new LinearOpModeTimeOutFunc(this, 5);
-        while (timeOutFunc.value()) {
-            telemetry.addData("color sensor data", Integer.toHexString(hardware.getLeftButtonPusherColorSensor().argb()));
-            telemetry.addData("color sensor data", Integer.toHexString(hardware.getRightButtonPusherColorSensor().argb()));
-            telemetry.update();
-        }
     }
 }

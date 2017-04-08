@@ -72,7 +72,7 @@ public class RobotHardware {
     public static final I2cAddr LOADER_COLOR_SENSOR_ADDRESS = I2cAddr.create8bit(0x32);
     // The constants for the button pusher positions
     public static final double BUTTON_PUSHER_CENTER_POSITION = 97 / 255.0;
-    public static final double BUTTON_PUSHER_RATIO = 1 / 2.0;
+    public static final double BUTTON_PUSHER_RATIO = 1.1 / 2.0;
     public static final double BUTTON_PUSHER_LEFT_FULL_EXTENSION = 67 / 255.0;
     public static final double BUTTON_PUSHER_RIGHT_FULL_EXTENSION = 127 / 255.0;
     public static final double BUTTON_PUSHER_RETRACTED = 228 / 255.0;
@@ -267,7 +267,7 @@ public class RobotHardware {
         return shooterRight;
     }
 
-    public DcMotor getShooter(){
+    public DcMotor getShooter() {
         return shooter;
     }
 
@@ -312,6 +312,14 @@ public class RobotHardware {
 
     public ColorSensor getRightButtonPusherColorSensor() {
         return rightButtonPusherColorSensor;
+    }
+
+    public ModernRoboticsI2cColorSensor getLeftSecondaryButtonPusherColorSensor() {
+        return leftSecondaryButtonPusherColorSensor;
+    }
+
+    public ModernRoboticsI2cColorSensor getRightSecondaryButtonPusherColorSensor() {
+        return rightSecondaryButtonPusherColorSensor;
     }
 
     public ModernRoboticsI2cColorSensor getLoaderColorSensor() {
@@ -544,9 +552,9 @@ public class RobotHardware {
         BeaconState colorState = UNDEFINED;
 
         if (colorSensor.alpha() > 0) {
-            if (colorSensor.red() > colorSensor.blue() + 1 && colorSensor.red() > colorSensor.green()) {
+            if (colorSensor.red() > colorSensor.blue() + 2 && colorSensor.red() > colorSensor.green()) {
                 colorState = RED;
-            } else if (colorSensor.blue() > colorSensor.red() + 1 && colorSensor.blue() > colorSensor.green()) {
+            } else if (colorSensor.blue() > colorSensor.red() + 2 && colorSensor.blue() > colorSensor.green()) {
                 colorState = BLUE;
             }
         }
