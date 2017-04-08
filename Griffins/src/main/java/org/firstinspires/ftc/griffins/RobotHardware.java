@@ -75,7 +75,7 @@ public class RobotHardware {
     public static final double BUTTON_PUSHER_RATIO = 1 / 2.0;
     public static final double BUTTON_PUSHER_LEFT_FULL_EXTENSION = 67 / 255.0;
     public static final double BUTTON_PUSHER_RIGHT_FULL_EXTENSION = 127 / 255.0;
-    public static final double BUTTON_PUSHER_RETRACTED = 213 / 255.0;
+    public static final double BUTTON_PUSHER_RETRACTED = 228 / 255.0;
     public static final double BUTTON_PUSHER_EXTENDED = 123 / 255.0;
     // The constants for the loader speeds
     public static final double LOADER_ZERO_POWER = 0;

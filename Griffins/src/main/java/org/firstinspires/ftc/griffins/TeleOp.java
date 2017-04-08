@@ -16,6 +16,10 @@ public abstract class TeleOp extends OpMode {
     protected BeaconState alliance;
     private RobotHardware hardware;
 
+    private DriveState driveMode;
+    private boolean rightBumper;
+    private boolean leftBumper;
+
     @Override
     public void init() {
         hardware = new RobotHardware();
@@ -26,6 +30,8 @@ public abstract class TeleOp extends OpMode {
 
         gamepad1.setJoystickDeadzone(0.1f);
         gamepad2.setJoystickDeadzone(0.1f);
+
+        driveMode = DriveState.NORMAL;
     }
 
     @Override
@@ -60,9 +66,19 @@ public abstract class TeleOp extends OpMode {
 
             intakeSpeed = gamepad1.left_trigger - gamepad1.right_trigger;
 
-            if (gamepad1.right_bumper || gamepad1.left_bumper) {
+
+            if (gamepad1.left_bumper && driveMode != DriveState.LEFT_WALL) {
+                driveMode = DriveState.LEFT_WALL;
+            } else if (gamepad1.right_bumper && driveMode != DriveState.RIGHT_WALL) {
+                driveMode = DriveState.RIGHT_WALL;
+            }
+
+            if (gamepad1.right_bumper) {
                 leftDrivePower *= .7;
-                rightDrivePower = leftDrivePower * 0.9;
+                rightDrivePower = leftDrivePower * 0.8;
+            } else if (gamepad1.left_bumper) {
+                rightDrivePower *= .7;
+                leftDrivePower = rightDrivePower * 0.8;
             }
 
         } //end gamepad 1 controls
@@ -163,5 +179,11 @@ public abstract class TeleOp extends OpMode {
     @Override
     public void stop() {
         hardware.retractButtonPusher();
+    }
+
+    public enum DriveState {
+        RIGHT_WALL,
+        LEFT_WALL,
+        NORMAL
     }
 }

@@ -106,6 +106,8 @@ public class PIDDrive {
             do {
                 biasedSyncDrives(leftBias, rightBias);
             } while (earlyExitCheck.value() && !pidDrive.isOnTarget());
+
+            hardware.stopDrive();
         }
 
     }

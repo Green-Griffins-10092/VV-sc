@@ -24,9 +24,9 @@ public class BeaconScan extends LinearOpMode {
 
         waitForStart();
 
-        sleep(500);
+        sleep(1000);
 
-        autoFunctions.scanForBeacon(DriveStraightDirection.BACKWARD, AutoFunctions.TurnDirection.RIGHT);
+        autoFunctions.scanForBeacon(DriveStraightDirection.FORWARD, AutoFunctions.TurnDirection.LEFT);
 
         sleep(1000);
 

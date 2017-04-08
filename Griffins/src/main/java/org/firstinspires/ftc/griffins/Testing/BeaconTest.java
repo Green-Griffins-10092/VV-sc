@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.griffins.AutoFunctions;
 import org.firstinspires.ftc.griffins.RobotHardware;
 
 import static org.firstinspires.ftc.griffins.RobotHardware.BUTTON_PUSHER_CENTER_POSITION;
@@ -25,9 +26,11 @@ public class BeaconTest extends LinearOpMode {
         hardware.initialize(hardwareMap);
         hardware.registerBeaconColorSensors();
 
+        AutoFunctions autoFunctions = new AutoFunctions(hardware, this);
+
         waitForStart();
 
-        RobotHardware.BeaconState beaconState = hardware.findBeaconState();
+        RobotHardware.BeaconState beaconState = hardware.findLeftBeaconState();
         /*if (beaconState.containsUndefined()) {
             telemetry.log().add("Beacon state undefined, attempting active beacon state finder");
             sleep(1000);
@@ -35,6 +38,11 @@ public class BeaconTest extends LinearOpMode {
         }*/
         telemetry.addData("Beacon State", beaconState);
         telemetry.update();
+
+        sleep(1000);
+
+        autoFunctions.pushBeacon(beaconState, RobotHardware.BeaconState.RED);
+
         sleep(1000);
         //hardware.pushButton(beaconState, RobotHardware.BeaconState.RED);
         sleep(3000);

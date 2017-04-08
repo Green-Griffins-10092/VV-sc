@@ -60,10 +60,14 @@ public class AutoFunctions {
     public void wallDrive(double signedPower, TurnDirection turnDirection) {
         double powerRatio = 0.8;
 
-        if (turnDirection == TurnDirection.RIGHT)
+        if (turnDirection == TurnDirection.RIGHT) {
             hardware.setDrivePower(signedPower, signedPower * powerRatio);
-        else if (turnDirection == TurnDirection.LEFT)
+            linearOpMode.telemetry.addData("Power L:R", signedPower + ":" + signedPower * powerRatio);
+        } else if (turnDirection == TurnDirection.LEFT) {
             hardware.setDrivePower(signedPower * powerRatio, signedPower);
+            linearOpMode.telemetry.addData("Power L:R", signedPower * powerRatio + ":" + signedPower);
+
+        }
     }
 
     private double determineDrivePower(DriveStraightDirection defaultDirection, TurnDirection turnDirection) {
@@ -73,6 +77,8 @@ public class AutoFunctions {
         } else {
             beaconState = hardware.findLeftBeaconState();
         }
+
+        linearOpMode.telemetry.addData("Beacon State", beaconState);
 
         double drivePower = 0;
 
@@ -91,19 +97,20 @@ public class AutoFunctions {
             }
         }
 
+        linearOpMode.telemetry.addData("Drive Power", drivePower);
+
         return drivePower;
     }
 
     public void scanForBeacon(DriveStraightDirection defaultDirection, TurnDirection turnDirection) {
         double drivePower = determineDrivePower(defaultDirection, turnDirection);
-        double lastDrivePower = drivePower;
 
         Func<Boolean> timeout = new AutoLoadTimeOutFunc(linearOpMode, 15);
 
         while (timeout.value() && drivePower != 0) {
-            lastDrivePower = drivePower;
             wallDrive(drivePower, turnDirection);
             drivePower = determineDrivePower(defaultDirection, turnDirection);
+            linearOpMode.telemetry.update();
         }
 
         hardware.setLoaderPower(0);
@@ -377,13 +384,16 @@ public class AutoFunctions {
     }
 
     public void pushBeacon(BeaconState beaconState, BeaconState alliance) {
+
+
         if (linearOpMode.opModeIsActive()) {
             beaconState = guessBeaconState(beaconState);
+            int inchesBetweenButtons = 5;
             if (alliance == BLUE) {
                 if (beaconState == BLUE_RED) {
                     hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
                 } else if (beaconState == RED_BLUE) {
-                    wallPIDDrive(5, DriveStraightDirection.FORWARD, TurnDirection.RIGHT, 1);
+                    wallPIDDrive(inchesBetweenButtons, DriveStraightDirection.FORWARD, TurnDirection.RIGHT, 1);
                     hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
                 } else if (beaconState == BLUE_BLUE) {
                     hardware.retractButtonPusher();
@@ -392,7 +402,7 @@ public class AutoFunctions {
                 }
             } else if (alliance == RED) {
                 if (beaconState == BLUE_RED) {
-                    wallPIDDrive(5, DriveStraightDirection.FORWARD, TurnDirection.LEFT, 1);
+                    wallPIDDrive(inchesBetweenButtons, DriveStraightDirection.FORWARD, TurnDirection.LEFT, 1);
                     hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
                 } else if (beaconState == RED_BLUE) {
                     hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
