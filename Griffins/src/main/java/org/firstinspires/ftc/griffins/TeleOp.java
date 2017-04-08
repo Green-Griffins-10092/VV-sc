@@ -75,10 +75,10 @@ public abstract class TeleOp extends OpMode {
 
             if (gamepad1.right_bumper) {
                 leftDrivePower *= .7;
-                rightDrivePower = leftDrivePower * 0.8;
+                rightDrivePower = leftDrivePower * 0.7;
             } else if (gamepad1.left_bumper) {
                 rightDrivePower *= .7;
-                leftDrivePower = rightDrivePower * 0.8;
+                leftDrivePower = rightDrivePower * 0.7;
             }
 
         } //end gamepad 1 controls
@@ -115,7 +115,7 @@ public abstract class TeleOp extends OpMode {
             }
 
             if (gamepad2.right_bumper) {
-                shooterPower = 0.70;
+                shooterPower = 0.75;
             } else if (gamepad2.right_trigger >= 0.5) {
                 shooterPower = 0.77;
             } else if (gamepad2.left_bumper) {
