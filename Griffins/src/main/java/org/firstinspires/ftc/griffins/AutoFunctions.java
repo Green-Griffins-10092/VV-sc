@@ -26,7 +26,8 @@ import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.guessBeac
  */
 
 public class AutoFunctions {
-    public static double[] scanningSpeeds = {0.07, 0.15};
+    public static final double[] scanningSpeeds = {0.07, 0.15};
+    public static final double SHOOTING_SPEED = 0.765;
 
     private LinearOpMode linearOpMode;
     private RobotHardware hardware;
@@ -384,40 +385,51 @@ public class AutoFunctions {
     }
 
     public void pushBeacon(BeaconState beaconState, BeaconState alliance) {
+        pushBeacon(beaconState, alliance, false);
+    }
+
+    public void pushBeacon(BeaconState beaconState, BeaconState alliance, boolean shoot) {
         if (linearOpMode.opModeIsActive()) {
             beaconState = guessBeaconState(beaconState);
             double inchesBetweenButtons = 4.5;
-            if (alliance == BLUE) {
-                if (beaconState == BLUE_RED) {
-                    hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
-                } else if (beaconState == RED_BLUE) {
-                    wallPIDDrive(inchesBetweenButtons, DriveStraightDirection.FORWARD, TurnDirection.RIGHT, 1);
-                    hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
-                } else if (beaconState == BLUE_BLUE) {
-                    hardware.retractButtonPusher();
-                } else if (beaconState == RED_RED) {
-                    hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
-                }
-            } else if (alliance == RED) {
-                if (beaconState == BLUE_RED) {
-                    wallPIDDrive(inchesBetweenButtons, DriveStraightDirection.FORWARD, TurnDirection.LEFT, 1);
-                    hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
-                } else if (beaconState == RED_BLUE) {
-                    hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
-                } else if (beaconState == BLUE_BLUE) {
-                    hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
-                } else if (beaconState == RED_RED) {
-                    hardware.retractButtonPusher();
+
+            if (shoot) {
+                hardware.getShooter().setPower(SHOOTING_SPEED);
+            }
+
+            if ((alliance == BLUE && beaconState == RED_BLUE) || (alliance == RED && beaconState == BLUE_RED)) {
+                wallPIDDrive(inchesBetweenButtons, DriveStraightDirection.FORWARD, alliance == BLUE ? TurnDirection.RIGHT : TurnDirection.LEFT, 1);
+            }
+
+            if (shoot) {
+                autoLoadingSleep(500);
+                hardware.setLoaderPower(1);
+            }
+
+            if (!((alliance == BLUE && beaconState == BLUE_BLUE) || (alliance == RED && beaconState == RED_RED))) {
+                hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
+                if (shoot) {
+                    linearOpMode.sleep(2000);
+                } else {
+                    autoLoadingSleep(2000);
                 }
             }
 
-            autoLoadingSleep(2000);
+
             hardware.retractButtonPusher();
-            autoLoadingSleep(1000);
+            if (shoot) {
+                linearOpMode.sleep(1000);
+            } else {
+                autoLoadingSleep(1000);
+            }
         }
     }
 
     public void pushBeacon(BeaconState alliance) {
+        pushBeacon(alliance, false);
+    }
+
+    public void pushBeacon(BeaconState alliance, boolean shoot) {
         RobotHardware.BeaconState beaconState;
         if (alliance == BLUE) {
             beaconState = hardware.findRightBeaconState();
@@ -425,7 +437,7 @@ public class AutoFunctions {
             beaconState = hardware.findLeftBeaconState();
         }
 
-        pushBeacon(beaconState, alliance);
+        pushBeacon(beaconState, alliance, shoot);
     }
 
     public void pushBeacon() {
@@ -434,7 +446,7 @@ public class AutoFunctions {
 
     public void shoot(){
         if (linearOpMode.opModeIsActive()){
-            hardware.getShooter().setPower(.78);
+            hardware.getShooter().setPower(SHOOTING_SPEED);
             linearOpMode.sleep(500);
             hardware.setLoaderPower(1.0);
             linearOpMode.sleep(1000);

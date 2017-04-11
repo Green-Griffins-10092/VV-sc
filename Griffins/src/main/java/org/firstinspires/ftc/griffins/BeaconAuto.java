@@ -55,7 +55,7 @@ public abstract class BeaconAuto extends LinearOpMode {
         hardware.getIntake().setPower(0);
 
         //drive toward beacon wall
-        autoFunctions.driveStraightPID(52, AutoFunctions.DriveStraightDirection.FORWARD, 3, true);
+        autoFunctions.driveStraightPID(51, AutoFunctions.DriveStraightDirection.FORWARD, 3, true);
         telemetry.log().add("Arrived at beacon wall");
         telemetry.update();
 
@@ -85,7 +85,7 @@ public abstract class BeaconAuto extends LinearOpMode {
 
         setDrivePower(0.2, 0.1);
 
-        autoFunctions.autoLoadingSleep(500);
+        autoFunctions.autoLoadingSleep(200);
         hardware.stopDrive();
 
         autoFunctions.pushBeacon(color);
@@ -108,18 +108,13 @@ public abstract class BeaconAuto extends LinearOpMode {
         hardware.getIntake().setPower(0);
         hardware.getTurretRotation().setMode(DcMotor.RunMode.RUN_TO_POSITION);
         hardware.getTurretRotation().setTargetPosition((int) (hardware.getTurretRotation().getCurrentPosition() +
-                (toWall == AutoFunctions.TurnDirection.LEFT ? 1 : -1) * RobotHardware.ENCODER_COUNTS_PER_TURRET_REVOLUTION / 10));
+                (toWall == AutoFunctions.TurnDirection.LEFT ? 1 : -1) * RobotHardware.ENCODER_COUNTS_PER_TURRET_DEGREE * 38));
         hardware.getTurretRotation().setPower(.5);
-        hardware.getShooter().setPower(0.79);
 
-        while (this.opModeIsActive() && hardware.getTurretRotation().isBusy())
-            hardware.getTurretRotation().setPower(.5);
+        autoFunctions.pushBeacon(color, true);
 
-        hardware.setLoaderPower(.8);
-        autoFunctions.pushBeacon(color);
-
-        setDrivePower(0.2, 0.3);
-        sleep(800);
+        setDrivePower(0.25, 0.4);
+        sleep(900);
         setDrivePower(0, -0.6);
         sleep(800);
         setDrivePower(-0.5, -0.3);
