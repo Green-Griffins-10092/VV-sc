@@ -37,7 +37,9 @@ public abstract class BeaconAuto extends LinearOpMode {
             notColor = RobotHardware.BeaconState.BLUE;
         }
 
-        telemetry.log().add("versioning 8");
+        autoFunctions.setAlliance(color);
+        autoFunctions.setAlliance(null);
+        telemetry.log().add("versioning 10");
 
         waitForStart();
 

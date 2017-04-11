@@ -2,6 +2,7 @@ package org.firstinspires.ftc.griffins;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -11,6 +12,8 @@ import org.firstinspires.ftc.griffins.Navigation.PIDDrive;
 import org.firstinspires.ftc.griffins.Navigation.PIDRate;
 import org.firstinspires.ftc.griffins.RobotHardware.BeaconState;
 import org.firstinspires.ftc.robotcore.external.Func;
+
+import java.util.Iterator;
 
 import static org.firstinspires.ftc.griffins.RobotHardware.BUTTON_PUSHER_RATIO;
 import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.BLUE;
@@ -55,7 +58,17 @@ public class AutoFunctions {
     }
 
     public void setAlliance(BeaconState alliance) {
+        boolean red = alliance == RED || this.alliance == RED;
+        boolean blue = alliance == BLUE || this.alliance == BLUE;
+
         this.alliance = alliance;
+        Iterator dimIterator = linearOpMode.hardwareMap.deviceInterfaceModule.iterator();
+
+        for (DeviceInterfaceModule dim :
+                linearOpMode.hardwareMap.deviceInterfaceModule) {
+            dim.setLED(1, red); // red is 1
+            dim.setLED(0, blue);// blue is 0
+        }
     }
 
     public void wallDrive(double signedPower, TurnDirection turnDirection) {
