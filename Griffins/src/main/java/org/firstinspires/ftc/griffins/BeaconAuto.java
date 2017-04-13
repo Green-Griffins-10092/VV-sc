@@ -39,7 +39,7 @@ public abstract class BeaconAuto extends LinearOpMode {
 
         autoFunctions.setAlliance(color);
         autoFunctions.setAlliance(null);
-        telemetry.log().add("versioning 10");
+        telemetry.log().add("versioning 11");
 
         waitForStart();
 
@@ -61,7 +61,6 @@ public abstract class BeaconAuto extends LinearOpMode {
         telemetry.log().add("Arrived at beacon wall");
         telemetry.update();
 
-        autoFunctions.setAlliance(color);
 
         autoFunctions.driveStraightPID(2, AutoFunctions.DriveStraightDirection.BACKWARD, 1);
 
@@ -75,6 +74,7 @@ public abstract class BeaconAuto extends LinearOpMode {
         hardware.registerLoaderColorSensor();
 
         autoFunctions.driveStraightPID(22, AutoFunctions.DriveStraightDirection.FORWARD, 1.5, true);
+        autoFunctions.setAlliance(color);
         autoFunctions.wallPIDDrive(22, AutoFunctions.DriveStraightDirection.FORWARD, toWall, 2);
 
         //autoFunctions.twoWheelTurnPID(20, AutoFunctions.TurnDirection.RIGHT, .3, true); //timer out
@@ -92,13 +92,10 @@ public abstract class BeaconAuto extends LinearOpMode {
 
         autoFunctions.pushBeacon(color);
 
-        setDrivePower(-0.3, 0.3);
-
-        autoFunctions.autoLoadingSleep(300);
-        hardware.stopDrive();
-
         //autoFunctions.twoWheelTurnPID(45, AutoFunctions.TurnDirection.LEFT, 0.5, true); //timer out
         autoFunctions.wallPIDDrive(45, AutoFunctions.DriveStraightDirection.BACKWARD, toWall, 2);
+
+        autoFunctions.setAlliance(null);
 
         autoFunctions.scanForBeacon(AutoFunctions.DriveStraightDirection.BACKWARD, toWall);
 
@@ -130,7 +127,7 @@ public abstract class BeaconAuto extends LinearOpMode {
     public void setDrivePower(double power1, double power2) {
         if (alliance == Alliance.BLUE_ALLIANCE)
             hardware.setDrivePower(power1, power2);
-        if (alliance == Alliance.RED_ALLIANCE)
+        else
             hardware.setDrivePower(power2, power1);
     }
 

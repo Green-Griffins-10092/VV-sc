@@ -75,10 +75,10 @@ public abstract class TeleOp extends OpMode {
 
             if (gamepad1.right_bumper) {
                 leftDrivePower *= .7;
-                rightDrivePower = leftDrivePower * 0.7;
+                rightDrivePower = leftDrivePower * 0.6;
             } else if (gamepad1.left_bumper) {
                 rightDrivePower *= .7;
-                leftDrivePower = rightDrivePower * 0.7;
+                leftDrivePower = rightDrivePower * 0.6;
             }
 
         } //end gamepad 1 controls

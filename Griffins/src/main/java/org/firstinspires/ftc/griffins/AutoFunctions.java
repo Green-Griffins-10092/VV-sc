@@ -557,9 +557,9 @@ public class AutoFunctions {
         double leftBias = 0, rightBias = 0;
         if (turnDirection == TurnDirection.RIGHT) {
             leftBias = 1;
-            rightBias = .8;
+            rightBias = .6;
         } else if (turnDirection == TurnDirection.LEFT) {
-            leftBias = .8;
+            leftBias = .6;
             rightBias = 1;
         }
         drive.wallDriveToTarget(leftBias, rightBias, new AutoLoadTimeOutFunc(linearOpMode, timeoutSeconds));
