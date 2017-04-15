@@ -30,7 +30,7 @@ import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.guessBeac
 
 public class AutoFunctions {
     public static final double[] scanningSpeeds = {0.07, 0.15};
-    public static final double SHOOTING_SPEED = 0.765;
+    public static final double SHOOTING_SPEED = 0.73;
 
     private LinearOpMode linearOpMode;
     private RobotHardware hardware;
@@ -404,7 +404,7 @@ public class AutoFunctions {
     public void pushBeacon(BeaconState beaconState, BeaconState alliance, boolean shoot) {
         if (linearOpMode.opModeIsActive()) {
             beaconState = guessBeaconState(beaconState);
-            double inchesBetweenButtons = 4.5;
+            double inchesBetweenButtons = 4.7;
 
             if (shoot) {
                 hardware.getShooter().setPower(SHOOTING_SPEED);
@@ -416,7 +416,7 @@ public class AutoFunctions {
 
             if (shoot) {
                 autoLoadingSleep(500);
-                hardware.setLoaderPower(1);
+                hardware.setLoaderPower(0.75);
             }
 
             if (!((alliance == BLUE && beaconState == BLUE_BLUE) || (alliance == RED && beaconState == RED_RED))) {
@@ -435,6 +435,9 @@ public class AutoFunctions {
             } else {
                 autoLoadingSleep(1000);
             }
+
+            hardware.setLoaderPower(0);
+            hardware.getShooter().setPower(0);
         }
     }
 
@@ -461,11 +464,11 @@ public class AutoFunctions {
         if (linearOpMode.opModeIsActive()){
             hardware.getShooter().setPower(SHOOTING_SPEED);
             linearOpMode.sleep(500);
-            hardware.setLoaderPower(1.0);
+            hardware.setLoaderPower(0.75);
             linearOpMode.sleep(1000);
             hardware.setLoaderPower(0);
             linearOpMode.sleep(500);
-            hardware.setLoaderPower(1);
+            hardware.setLoaderPower(0.75);
             linearOpMode.sleep(1000);
             hardware.getShooter().setPower(0.0);
             hardware.setLoaderPower(0.0);

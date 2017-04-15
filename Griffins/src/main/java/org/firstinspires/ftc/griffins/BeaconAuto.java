@@ -85,9 +85,9 @@ public abstract class BeaconAuto extends LinearOpMode {
 
         hardware.setLoaderPower(0);
 
-        setDrivePower(0.2, 0.1);
+/*        setDrivePower(0.2, 0.1);
 
-        autoFunctions.autoLoadingSleep(200);
+        autoFunctions.autoLoadingSleep(200);*/
         hardware.stopDrive();
 
         autoFunctions.pushBeacon(color);
@@ -99,15 +99,15 @@ public abstract class BeaconAuto extends LinearOpMode {
 
         autoFunctions.scanForBeacon(AutoFunctions.DriveStraightDirection.BACKWARD, toWall);
 
-        setDrivePower(-0.2, -0.1);
+        /*setDrivePower(-0.2, -0.1);
 
         autoFunctions.autoLoadingSleep(300);
-        hardware.stopDrive();
+        hardware.stopDrive();*/
 
         hardware.getIntake().setPower(0);
         hardware.getTurretRotation().setMode(DcMotor.RunMode.RUN_TO_POSITION);
         hardware.getTurretRotation().setTargetPosition((int) (hardware.getTurretRotation().getCurrentPosition() +
-                (toWall == AutoFunctions.TurnDirection.LEFT ? 1 : -1) * RobotHardware.ENCODER_COUNTS_PER_TURRET_DEGREE * 38));
+                (toWall == AutoFunctions.TurnDirection.LEFT ? 1 : -1) * RobotHardware.ENCODER_COUNTS_PER_TURRET_DEGREE * 40));
         hardware.getTurretRotation().setPower(.5);
 
         autoFunctions.pushBeacon(color, true);
