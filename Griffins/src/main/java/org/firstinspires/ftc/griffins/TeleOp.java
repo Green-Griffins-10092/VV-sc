@@ -115,9 +115,9 @@ public abstract class TeleOp extends OpMode {
             }
 
             if (gamepad2.right_bumper) {
-                shooterPower = 0.75;
+                shooterPower = 0.76;
             } else if (gamepad2.right_trigger >= 0.5) {
-                shooterPower = 0.77;
+                shooterPower = 0.74;
             } else if (gamepad2.left_bumper) {
                 shooterPower = -0.7;
             } else {

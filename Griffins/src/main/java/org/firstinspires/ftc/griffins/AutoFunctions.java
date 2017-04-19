@@ -22,6 +22,7 @@ import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.BLUE_RED;
 import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.RED;
 import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.RED_BLUE;
 import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.RED_RED;
+import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.UNDEFINED_UNDEFINED;
 import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.guessBeaconState;
 
 /**
@@ -30,7 +31,7 @@ import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.guessBeac
 
 public class AutoFunctions {
     public static final double[] scanningSpeeds = {0.07, 0.15};
-    public static final double SHOOTING_SPEED = 0.73;
+    public static final double SHOOTING_SPEED = 0.72;
 
     private LinearOpMode linearOpMode;
     private RobotHardware hardware;
@@ -119,9 +120,20 @@ public class AutoFunctions {
     public void scanForBeacon(DriveStraightDirection defaultDirection, TurnDirection turnDirection) {
         double drivePower = determineDrivePower(defaultDirection, turnDirection);
 
-        Func<Boolean> timeout = new AutoLoadTimeOutFunc(linearOpMode, 15);
+        Func<Boolean> timeout = new AutoLoadTimeOutFunc(linearOpMode, 3);
 
         while (timeout.value() && drivePower != 0) {
+            wallDrive(drivePower, turnDirection);
+            drivePower = determineDrivePower(defaultDirection, turnDirection);
+            linearOpMode.telemetry.update();
+        }
+
+        hardware.setLoaderPower(0);
+        hardware.getIntake().setPower(0);
+        timeout = new LinearOpModeTimeOutFunc(linearOpMode, 2);
+
+        while (timeout.value() && drivePower != 0) {
+            hardware.getIntake().setPower(-1);
             wallDrive(drivePower, turnDirection);
             drivePower = determineDrivePower(defaultDirection, turnDirection);
             linearOpMode.telemetry.update();
@@ -403,41 +415,52 @@ public class AutoFunctions {
 
     public void pushBeacon(BeaconState beaconState, BeaconState alliance, boolean shoot) {
         if (linearOpMode.opModeIsActive()) {
-            beaconState = guessBeaconState(beaconState);
-            double inchesBetweenButtons = 4.7;
+            if (beaconState != UNDEFINED_UNDEFINED) {
+                beaconState = guessBeaconState(beaconState);
 
-            if (shoot) {
-                hardware.getShooter().setPower(SHOOTING_SPEED);
-            }
+                double inchesBetweenButtons = 4.7;
+                BeaconState previousAlliance = this.alliance;
 
-            if ((alliance == BLUE && beaconState == RED_BLUE) || (alliance == RED && beaconState == BLUE_RED)) {
-                wallPIDDrive(inchesBetweenButtons, DriveStraightDirection.FORWARD, alliance == BLUE ? TurnDirection.RIGHT : TurnDirection.LEFT, 1);
-            }
-
-            if (shoot) {
-                autoLoadingSleep(500);
-                hardware.setLoaderPower(0.75);
-            }
-
-            if (!((alliance == BLUE && beaconState == BLUE_BLUE) || (alliance == RED && beaconState == RED_RED))) {
-                hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
                 if (shoot) {
-                    linearOpMode.sleep(2000);
-                } else {
-                    autoLoadingSleep(2000);
+                    hardware.getShooter().setPower(SHOOTING_SPEED);
                 }
+
+                if ((alliance == BLUE && beaconState == RED_BLUE) || (alliance == RED && beaconState == BLUE_RED)) {
+                    if (!shoot) {
+                        hardware.getIntake().setPower(-1);
+                        this.alliance = null;
+                    }
+                    wallPIDDrive(inchesBetweenButtons, DriveStraightDirection.FORWARD, alliance == BLUE ? TurnDirection.RIGHT : TurnDirection.LEFT, 1);
+
+                }
+
+                if (shoot) {
+                    autoLoadingSleep(500);
+                    hardware.setLoaderPower(0.75);
+                }
+
+                if (!((alliance == BLUE && beaconState == BLUE_BLUE) || (alliance == RED && beaconState == RED_RED))) {
+                    hardware.extendButtonPusher(BUTTON_PUSHER_RATIO);
+                    if (shoot) {
+                        linearOpMode.sleep(2000);
+                    } else {
+                        autoLoadingSleep(2000);
+                    }
+                }
+
+
+                hardware.retractButtonPusher();
+                if (shoot) {
+                    linearOpMode.sleep(1000);
+                } else {
+                    autoLoadingSleep(1000);
+                    this.alliance = previousAlliance;
+                }
+
+                hardware.setLoaderPower(0);
+                hardware.getShooter().setPower(0);
+                hardware.getIntake().setPower(0);
             }
-
-
-            hardware.retractButtonPusher();
-            if (shoot) {
-                linearOpMode.sleep(1000);
-            } else {
-                autoLoadingSleep(1000);
-            }
-
-            hardware.setLoaderPower(0);
-            hardware.getShooter().setPower(0);
         }
     }
 
