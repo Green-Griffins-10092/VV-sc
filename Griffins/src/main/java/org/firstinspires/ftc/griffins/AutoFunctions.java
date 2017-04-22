@@ -31,7 +31,7 @@ import static org.firstinspires.ftc.griffins.RobotHardware.BeaconState.guessBeac
 
 public class AutoFunctions {
     public static final double[] scanningSpeeds = {0.07, 0.15};
-    public static final double SHOOTING_SPEED = 0.72;
+    public static final double SHOOTING_SPEED = 0.71;
 
     private LinearOpMode linearOpMode;
     private RobotHardware hardware;
@@ -417,18 +417,24 @@ public class AutoFunctions {
         if (linearOpMode.opModeIsActive()) {
             if (beaconState != UNDEFINED_UNDEFINED) {
                 beaconState = guessBeaconState(beaconState);
+                boolean drove = false;
 
-                double inchesBetweenButtons = 4.7;
+                double inchesBetweenButtons = 4.8;
                 BeaconState previousAlliance = this.alliance;
 
                 if (shoot) {
-                    hardware.getShooter().setPower(SHOOTING_SPEED);
+                    hardware.getShooter().setPower(0.76);
                 }
 
                 if ((alliance == BLUE && beaconState == RED_BLUE) || (alliance == RED && beaconState == BLUE_RED)) {
+                    drove = true;
                     if (!shoot) {
                         hardware.getIntake().setPower(-1);
                         this.alliance = null;
+                    } else {
+                        hardware.getTurretRotation().setTargetPosition((int) (hardware.getTurretRotation().getTargetPosition() +
+                                (alliance == RED ? 1 : -1) * RobotHardware.ENCODER_COUNTS_PER_TURRET_DEGREE * 6));
+                        hardware.getTurretRotation().setPower(.5);
                     }
                     wallPIDDrive(inchesBetweenButtons, DriveStraightDirection.FORWARD, alliance == BLUE ? TurnDirection.RIGHT : TurnDirection.LEFT, 1);
 
@@ -449,12 +455,17 @@ public class AutoFunctions {
                 }
 
 
+
                 hardware.retractButtonPusher();
                 if (shoot) {
                     linearOpMode.sleep(1000);
                 } else {
                     autoLoadingSleep(1000);
                     this.alliance = previousAlliance;
+                }
+
+                if (drove && !shoot) {
+                    wallPIDDrive(inchesBetweenButtons, DriveStraightDirection.BACKWARD, alliance == BLUE ? TurnDirection.RIGHT : TurnDirection.LEFT, 1);
                 }
 
                 hardware.setLoaderPower(0);
@@ -621,7 +632,7 @@ public class AutoFunctions {
 
             if (alliance != null) {
                 double loaderPower = loaderTimer.milliseconds() > 200 ? 0 : .5;
-                double intakePower = reverseTimer.milliseconds() > 500 ? 1 : -1;
+                double intakePower = reverseTimer.milliseconds() > 750 ? 1 : -1;
 
                 BeaconState ball = hardware.findParticleColor();
 

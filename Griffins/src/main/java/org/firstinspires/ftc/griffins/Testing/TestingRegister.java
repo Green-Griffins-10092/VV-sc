@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package org.firstinspires.ftc.griffins.Testing;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
-import com.qualcomm.robotcore.eventloop.opmode.OpModeRegistrar;
 
 import org.firstinspires.ftc.griffins.TeleOpJosh;
 
@@ -62,7 +61,7 @@ import org.firstinspires.ftc.griffins.TeleOpJosh;
  */
 public class TestingRegister {
 
-    @OpModeRegistrar
+    //    @OpModeRegistrar
     public static void registerMyOpModes(OpModeManager manager) {
         //manager.register("Accelerometer Comparison", AccelerometerComparison.class);
         //manager.register("Adafruit IMU Test", AdafruitTest.class);
