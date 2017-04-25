@@ -423,7 +423,7 @@ public class AutoFunctions {
                 BeaconState previousAlliance = this.alliance;
 
                 if (shoot) {
-                    hardware.getShooter().setPower(0.76);
+                    hardware.getShooter().setPower(0.765);
                 }
 
                 if ((alliance == BLUE && beaconState == RED_BLUE) || (alliance == RED && beaconState == BLUE_RED)) {
@@ -497,7 +497,7 @@ public class AutoFunctions {
     public void shoot(){
         if (linearOpMode.opModeIsActive()){
             hardware.getShooter().setPower(SHOOTING_SPEED);
-            linearOpMode.sleep(500);
+            linearOpMode.sleep(700);
             hardware.setLoaderPower(0.75);
             linearOpMode.sleep(1000);
             hardware.setLoaderPower(0);
