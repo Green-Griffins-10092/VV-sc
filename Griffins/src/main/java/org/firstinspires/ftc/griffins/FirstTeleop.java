@@ -19,6 +19,7 @@ public class FirstTeleop extends OpMode {
 
     @Override
     public void loop() {
+
         double left;
         double right;
         double intake;
@@ -26,7 +27,6 @@ public class FirstTeleop extends OpMode {
         left = -gamepad1.left_stick_y;
         right = -gamepad1.right_stick_y;
         intake = gamepad1.left_trigger;
-
 
         robot.getLeftDrive().setPower(left);
         robot.getRightDrive().setPower(right);
